@@ -8,6 +8,6 @@ class IntegrationWolframAlpha():
     @classmethod
     def perform_check(cls, sentence):
         answer = requests.post(f"http://api.wolframalpha.com/v1/conversation.jsp?appid={cls.credential}&i={sentence}").json()
-        if not answer:
-            answer = {"error": "No result is found"}
-        return answer
+        if answer["error"]:
+            return {"error": "No result is found"}
+        return json.dumps({"forced_behaviour": False, "answer": answer["result"]})

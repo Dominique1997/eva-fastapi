@@ -1,0 +1,30 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "hi",
+        "hello",
+        "good morning"
+      ],
+      "responses": [
+        "hi how are you",
+        "hello"
+      ]
+    },
+    {
+      "tag": "minecraft_sword",
+      "patterns": [
+        "i need my sword",
+        "provide my sword",
+        "give me my sword",
+        "i do not see my sword",
+        "where is my sword"
+      ],
+      "responses": [
+        "sword is coming",
+        "sword will be provided"
+      ]
+    }
+  ]
+}

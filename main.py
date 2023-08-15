@@ -10,7 +10,6 @@ from integrations.integration_wolframalpha import *
 
 
 app = FastAPI()
-#settings = json.load(open("settings.json"))
 ai.load_intents()
 
 @app.get("/api/status")
@@ -21,10 +20,10 @@ async def get_api_state():
 async def general_check_command(sentence):
     answer_wolframalpha = IntegrationWolframAlpha.perform_check(sentence)
     answer_ai = ai.check_sentence(sentence)
-    if "error" not in answer_wolframalpha:
-        return json.loads(answer_wolframalpha)
     if "error" not in answer_ai:
-        return json.loads(answer_ai)
+        return answer_ai
+    if "error" not in answer_wolframalpha:
+        return answer_wolframalpha
     return {"error": "No result is found"}
 
 @app.get("/api/login")
@@ -39,7 +38,22 @@ async def login(username, password):
 
 @app.post("/api/create_new_user")
 async def create_new_user(username, password):
-    pass
+    db_response = Database.create_new_user(username, password)
+    return db_response
+@app.post("/api/update_existing_user")
+async def update_existing_user(userid, new_username, new_password):
+    db_response = Database.update_user(userid, new_username, new_password)
+    return db_response
+
+@app.post("/api/delete_existing_user")
+async def delete_existing_user(username, password):
+    db_response = Database.delete_user(username, password)
+    return db_response
+
+@app.post("/api/select_existing_user")
+async def select_existing_user(username, password):
+    db_response = Database.select_user(username, password)
+    return db_response
 
 
 if __name__ == "__main__":

@@ -7,17 +7,17 @@ class Settings:
 
     @classmethod
     def get_encryption_key(cls):
+        print(cls.settings["encryption_key"])
         return cls.settings["encryption_key"]
 
     @classmethod
     def get_algorithm(cls):
+        print(cls.settings["algorithm"])
         return cls.settings["algorithm"]
 
     @classmethod
     def get_delta_time(cls):
         return timedelta(
-            microseconds=cls.settings["login_time_microseconds"],
-            milliseconds=cls.settings["login_time_milliseconds"],
             seconds=cls.settings["login_time_seconds"],
             minutes=cls.settings["login_time_minutes"],
             hours=cls.settings["login_time_hours"],

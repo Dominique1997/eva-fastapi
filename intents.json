@@ -10,6 +10,9 @@
       "responses": [
         "hi how are you",
         "hello"
+      ],
+      "accessible_by": [
+        "discord"
       ]
     },
     {
@@ -24,6 +27,9 @@
       "responses": [
         "sword is coming",
         "sword will be provided"
+      ],
+      "accessible_by": [
+        "windows"
       ]
     }
   ]

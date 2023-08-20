@@ -1,6 +1,7 @@
 import jwt
 import sqlite3
 
+
 class Database():
 
     key = "testing"
@@ -12,6 +13,7 @@ class Database():
                 "userid"	INTEGER NOT NULL,\
                 "username"	TEXT NOT NULL,\
                 "password"	TEXT,\
+                "discord_username"	TEXT,\
                 PRIMARY KEY("userid" AUTOINCREMENT)\
                 )'
             create_new_table_tokens_statement = 'CREATE TABLE "tokens" (\
@@ -44,19 +46,20 @@ class Database():
         with sqlite3.connect("eva-database.db") as db:
             update_user_statement = f'UPDATE users SET username="{new_username}", password="{new_password}" WHERE userid="{userid}"'
             answer_updating_user = db.execute(update_user_statement)
-            print(answer_updating_user.rowcount)
             if answer_updating_user.lastrowid > 0:
                 return {"confirmation": "User has been updated"}
             return {"error": "User could not be updated"}
 
 
     @classmethod
-    def select_user(cls, username, password):
+    def select_user(cls, program_type, username, password, discord_username):
         with sqlite3.connect("eva-database.db") as db:
             db_cursor = db.cursor()
-            command = f'SELECT * FROM users WHERE username = "{username}" AND password = "{password}"'
+            if program_type != "discord":
+                command = f'SELECT * FROM users WHERE username = "{username}" AND password = "{password}"'
+            else:
+                command = f'SELECT * FROM users WHERE discord_username = "{discord_username}"'
             db_data = db_cursor.execute(command).fetchall()
-            print(len(db_data))
             if len(db_data) > 1 or len(db_data) == 0:
                 return {"Login_state": "login_error", "Message": "User not found"}
-            return {"Login_state": "logged_in", "Message": "User is found", "username": username, "password": password}
+            return {"Login_state": "logged_in", "Message": "User is found"}

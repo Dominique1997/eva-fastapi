@@ -1,8 +1,6 @@
 {
   "encryption_key": "testing",
   "algorithm": "HS256",
-  "login_time_microseconds": 0,
-  "login_time_milliseconds": 0,
   "login_time_seconds": 0,
   "login_time_minutes": 0,
   "login_time_hours": 1,

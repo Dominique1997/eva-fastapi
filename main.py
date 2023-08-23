@@ -50,7 +50,6 @@ async def login(login_query):
     return JSONResponse(content=db_response, media_type="application/json")
 
 
-
 @app.post("/api/create_new_user")
 async def create_new_user(username, password):
     db_response = Database.create_new_user(username, password)
@@ -64,8 +63,8 @@ async def update_existing_user(userid, new_username, new_password):
 
 
 @app.post("/api/delete_existing_user")
-async def delete_existing_user(username, password):
-    db_response = Database.delete_user(username, password)
+async def delete_existing_user(userid):
+    db_response = Database.delete_user(userid)
     return JSONResponse(content=db_response, media_type="application/json")
 
 
@@ -73,6 +72,24 @@ async def delete_existing_user(username, password):
 async def select_existing_user(username, password):
     db_response = Database.select_user(username, password)
     return JSONResponse(content=db_response, media_type="application/json")
+
+@app.post("/api/add_user_token")
+async def add_user_token(userID, server_ip, server_port, server_username, server_password, server_token):
+    Database.add_user_token(userID, server_ip, server_port, server_username, server_password, server_token)
+    return {"Result": "DONE"}
+
+@app.post("/api/update_user_token")
+async def add_user_token(tokenID, userID, server_ip, server_port, server_username, server_password, server_token):
+    Database.update_user_token(tokenID, userID, server_ip, server_port, server_username, server_password, server_token)
+    return {"Result": "DONE"}
+
+@app.post("/api/select_user_token")
+async def select_user_token(tokenid, userid):
+    Database.select_user_token(tokenid, userid)
+
+@app.post("/api/delete_user_token")
+async def delete_user_token(tokenid, userid):
+    Database.delete_user_token(tokenid, userid)
 
 
 if __name__ == "__main__":

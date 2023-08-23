@@ -2,7 +2,7 @@ import jwt
 import sqlite3
 
 
-class Database():
+class Database:
 
     key = "testing"
     algorithm = "HS256"
@@ -37,9 +37,14 @@ class Database():
             return {"error": "User could not be created"}
 
     @classmethod
-    def delete_user(cls, username, password):
+    def delete_user(cls, userid):
         with sqlite3.connect("eva-database.db") as db:
-            pass
+            remove_user_statement = f"DELETE FROM users WHERE userid == {userid}"
+            answer_removing_user = db.execute(remove_user_statement)
+            print(answer_removing_user.lastrowid)
+            if answer_removing_user.lastrowid > 0:
+                return {"confirmation": "User has been removed"}
+            return {"error": "User could not be removed"}
 
     @classmethod
     def update_user(cls, userid, new_username, new_password):
@@ -56,10 +61,50 @@ class Database():
         with sqlite3.connect("eva-database.db") as db:
             db_cursor = db.cursor()
             if program_type != "discord":
-                command = f'SELECT * FROM users WHERE username = "{username}" AND password = "{password}"'
+                select_user_statement = f'SELECT * FROM users WHERE username = "{username}" AND password = "{password}"'
             else:
-                command = f'SELECT * FROM users WHERE discord_username = "{discord_username}"'
-            db_data = db_cursor.execute(command).fetchall()
+                select_user_statement = f'SELECT * FROM users WHERE discord_username = "{discord_username}"'
+            db_data = db_cursor.execute(select_user_statement).fetchall()
             if len(db_data) > 1 or len(db_data) == 0:
                 return {"Login_state": "login_error", "Message": "User not found"}
             return {"Login_state": "logged_in", "Message": "User is found"}
+
+    #RETURN STATE NEEDS TO BE UPDATED
+    @classmethod
+    def add_user_token(cls, userid, server_ip, server_port, server_username, server_password, server_token):
+        with sqlite3.connect("eva-database.db") as db:
+            db_cursor = db.cursor()
+            add_user_token_statement = f"INSERT INTO tokens(userID, server_ip, server_port, server_username, server_password, server_token)" \
+                      f"VALUES('{userid}','{server_ip}',' {server_port}', '{server_username}', '{server_password}'," \
+                      f"'{server_token}')"
+            print(db_cursor.execute(add_user_token_statement))
+
+    # RETURN STATE NEEDS TO BE UPDATED
+    @classmethod
+    def update_user_token(cls, tokenid, userid, server_ip, server_port, server_username, server_password, server_token):
+        with sqlite3.connect("eva-database.db") as db:
+            db_cursor = db.cursor()
+            add_user_token_statement = f'UPDATE tokens ' \
+                                       f'SET server_ip="{server_ip}",' \
+                                       f'server_port="{server_port}",' \
+                                       f'server_username="{server_username}",' \
+                                       f'server_password="{server_password}",' \
+                                       f'server_token="{server_token}"' \
+                                       f'WHERE userID="{userid}" and tokenid="{tokenid}"'
+            print(db_cursor.execute(add_user_token_statement).lastrowid)
+
+    @classmethod
+    def delete_user_token(cls, tokenid, userid):
+        with sqlite3.connect("eva-database.db") as db:
+            db_cursor = db.cursor()
+            add_user_token_statement = f"DELETE FROM tokens WHERE userid == {userid} and tokenid == {tokenid}"
+            print(db_cursor.execute(add_user_token_statement))
+
+    # RETURN STATE NEEDS TO BE UPDATED
+    @classmethod
+    def select_user_token(cls, tokenid, userid):
+        with sqlite3.connect("eva-database.db") as db:
+            db_cursor = db.cursor()
+            add_user_token_statement = f'SELECT * FROM tokens ' \
+                                       f'WHERE userID="{userid}" and tokenid="{tokenid}"'
+            print(db_cursor.execute(add_user_token_statement).fetchall())

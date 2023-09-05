@@ -1,11 +1,11 @@
 import jwt
 import sqlite3
-
+from settings import Settings
 
 class Database:
 
-    key = "testing"
-    algorithm = "HS256"
+    key = Settings.get_encryption_key()
+    algorithm = Settings.get_algorithm()
     @classmethod
     def new_database_setup(cls):
         with sqlite3.connect("eva-database.db") as db:
@@ -32,7 +32,8 @@ class Database:
         with sqlite3.connect("eva-database.db") as db:
             create_new_user_statement = f'INSERT INTO users(username,password) VALUES("{username}","{password}")'
             answer_creation_user = db.execute(create_new_user_statement)
-            if answer_creation_user.lastrowid > 0:
+            print(answer_creation_user.rowcount)
+            if answer_creation_user.rowcount > 0:
                 return {"confirmation": "User has been created"}
             return {"error": "User could not be created"}
 
@@ -41,8 +42,8 @@ class Database:
         with sqlite3.connect("eva-database.db") as db:
             remove_user_statement = f"DELETE FROM users WHERE userid == {userid}"
             answer_removing_user = db.execute(remove_user_statement)
-            print(answer_removing_user.lastrowid)
-            if answer_removing_user.lastrowid > 0:
+            print(answer_removing_user.rowcount)
+            if answer_removing_user.rowcount > 0:
                 return {"confirmation": "User has been removed"}
             return {"error": "User could not be removed"}
 
@@ -51,7 +52,7 @@ class Database:
         with sqlite3.connect("eva-database.db") as db:
             update_user_statement = f'UPDATE users SET username="{new_username}", password="{new_password}" WHERE userid="{userid}"'
             answer_updating_user = db.execute(update_user_statement)
-            if answer_updating_user.lastrowid > 0:
+            if answer_updating_user.rowcount > 0:
                 return {"confirmation": "User has been updated"}
             return {"error": "User could not be updated"}
 
@@ -65,6 +66,7 @@ class Database:
             else:
                 select_user_statement = f'SELECT * FROM users WHERE discord_username = "{discord_username}"'
             db_data = db_cursor.execute(select_user_statement).fetchall()
+            print(db_cursor.execute(select_user_statement).rowcount)
             if len(db_data) > 1 or len(db_data) == 0:
                 return {"Login_state": "login_error", "Message": "User not found"}
             return {"Login_state": "logged_in", "Message": "User is found"}
@@ -77,9 +79,7 @@ class Database:
             add_user_token_statement = f"INSERT INTO tokens(userID, server_ip, server_port, server_username, server_password, server_token)" \
                       f"VALUES('{userid}','{server_ip}',' {server_port}', '{server_username}', '{server_password}'," \
                       f"'{server_token}')"
-            print(db_cursor.execute(add_user_token_statement))
-
-    # RETURN STATE NEEDS TO BE UPDATED
+            print(db_cursor.execute(add_user_token_statement).rowcount)
     @classmethod
     def update_user_token(cls, tokenid, userid, server_ip, server_port, server_username, server_password, server_token):
         with sqlite3.connect("eva-database.db") as db:
@@ -91,20 +91,19 @@ class Database:
                                        f'server_password="{server_password}",' \
                                        f'server_token="{server_token}"' \
                                        f'WHERE userID="{userid}" and tokenid="{tokenid}"'
-            print(db_cursor.execute(add_user_token_statement).lastrowid)
+            print(db_cursor.execute(add_user_token_statement).rowcount)
 
     @classmethod
     def delete_user_token(cls, tokenid, userid):
         with sqlite3.connect("eva-database.db") as db:
             db_cursor = db.cursor()
             add_user_token_statement = f"DELETE FROM tokens WHERE userid == {userid} and tokenid == {tokenid}"
-            print(db_cursor.execute(add_user_token_statement))
+            print(db_cursor.execute(add_user_token_statement).rowcount)
 
-    # RETURN STATE NEEDS TO BE UPDATED
     @classmethod
     def select_user_token(cls, tokenid, userid):
         with sqlite3.connect("eva-database.db") as db:
             db_cursor = db.cursor()
             add_user_token_statement = f'SELECT * FROM tokens ' \
                                        f'WHERE userID="{userid}" and tokenid="{tokenid}"'
-            print(db_cursor.execute(add_user_token_statement).fetchall())
+            print(db_cursor.execute(add_user_token_statement).rowcount)

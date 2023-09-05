@@ -7,12 +7,10 @@ class Settings:
 
     @classmethod
     def get_encryption_key(cls):
-        print(cls.settings["encryption_key"])
         return cls.settings["encryption_key"]
 
     @classmethod
     def get_algorithm(cls):
-        print(cls.settings["algorithm"])
         return cls.settings["algorithm"]
 
     @classmethod

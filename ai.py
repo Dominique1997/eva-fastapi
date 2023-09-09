@@ -2,13 +2,12 @@ import json
 import nltk
 import difflib
 from random import choice
-from utilities import Utilities
 from nltk.corpus import stopwords
 
 nltk.download('stopwords')
 
 class ai():
-    intents = json.load(open("intents.json"))["intents"]
+    intents = json.load(open("json_files/intents.json"))["intents"]
     recognize_data = {}
     ignore_stopwords = ["hi", "hello"]
 

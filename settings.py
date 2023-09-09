@@ -3,7 +3,7 @@ from datetime import timedelta
 
 
 class Settings:
-    settings = json.load(open("settings.json"))
+    settings = json.load(open("json_files/settings.json"))
 
     @classmethod
     def get_encryption_key(cls):

@@ -7,6 +7,7 @@ from database import Database
 from datetime import datetime
 from fastapi.responses import JSONResponse
 from integrations.integration_wolframalpha import *
+from integrations.integration_ai import IntegrationAi as ai
 
 app = FastAPI()
 ai.load_intents()
@@ -18,12 +19,15 @@ def generate_token(data, type_data):
 
 
 def general_check_command(sentence, received_from):
-    answer_ai = ai.check_sentence(sentence)
+    answer_ai = ai.check_sentence(sentence, received_from)
     if "error" not in answer_ai:
+        print("ai")
         return JSONResponse(content=answer_ai, media_type="json")
     answer_wolframalpha = IntegrationWolframAlpha.perform_check(sentence)
     if "error" not in answer_wolframalpha:
+        print("wolframalpha")
         return JSONResponse(content=answer_wolframalpha, media_type="json")
+    print("error")
     return JSONResponse(content={"error": "No result is found"}, media_type="application/json")
 
 @app.get("/api/status")

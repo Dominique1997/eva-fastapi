@@ -3,7 +3,7 @@ import difflib
 
 class Utilities:
     @classmethod
-    def average_similarity(cls, input_sentence, compare_sentence):
+    def _average_similarity(cls, input_sentence, compare_sentence):
         total_similarity = 0
         total_pairs = 0
 

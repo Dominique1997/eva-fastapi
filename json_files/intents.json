@@ -12,7 +12,8 @@
         "hello"
       ],
       "accessible_by": [
-        "discord"
+        "discord",
+        "windows"
       ]
     },
     {

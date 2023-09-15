@@ -1,11 +1,9 @@
-import json
 import requests
-from ai import ai
 import wolframalpha
-
+from credentials import Credentials
 
 class IntegrationWolframAlpha():
-    appID = json.load(open("secrets.json"))["wolframalpha"]["app_id"]
+    appID = Credentials.get_wolframalpha_app_id()
     error_message = "Wolfram Alpha did not understand your input"
     client = wolframalpha.Client(appID)
 

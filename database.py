@@ -13,7 +13,6 @@ class Database:
                 "userid"	INTEGER NOT NULL,\
                 "username"	TEXT NOT NULL,\
                 "password"	TEXT,\
-                "discord_username"	TEXT,\
                 PRIMARY KEY("userid" AUTOINCREMENT)\
                 )'
             create_new_table_tokens_statement = 'CREATE TABLE "tokens" (\
@@ -58,13 +57,10 @@ class Database:
 
 
     @classmethod
-    def select_user(cls, program_type, username, password, discord_username):
+    def select_user(cls, username, password):
         with sqlite3.connect("eva-database.db") as db:
             db_cursor = db.cursor()
-            if program_type != "discord":
-                select_user_statement = f'SELECT * FROM users WHERE username = "{username}" AND password = "{password}"'
-            else:
-                select_user_statement = f'SELECT * FROM users WHERE discord_username = "{discord_username}"'
+            select_user_statement = f'SELECT * FROM users WHERE username = "{username}" AND password = "{password}"'
             db_data = db_cursor.execute(select_user_statement).fetchall()
             print(db_cursor.execute(select_user_statement).rowcount)
             if len(db_data) > 1 or len(db_data) == 0:

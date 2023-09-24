@@ -2,6 +2,7 @@ import os
 import jwt
 import uvicorn
 from fastapi import *
+from dataModels import *
 from settings import Settings
 from database import Database
 from datetime import datetime
@@ -12,11 +13,9 @@ from integrations.integration_ai import IntegrationAi as ai
 app = FastAPI()
 ai.load_intents()
 
-
 def generate_token(data, type_data):
     login_token = jwt.encode(data, key=Settings.get_encryption_key(), algorithm=Settings.get_algorithm())
     return JSONResponse(content={type_data: login_token}, media_type="application/json")
-
 
 def general_check_command(sentence, received_from):
     answer_ai = ai.check_sentence(sentence, received_from)
@@ -34,20 +33,19 @@ def general_check_command(sentence, received_from):
 async def get_api_state():
     return {"api_state": True}
 
-@app.get("/api/login/create_token", tags=["login", "get"])
-async def create_login_token(username="UNKNOWN", password="UNKNOWN", discord_username="UNKNOWN", program_type="UNKNOWN"):
-    data_string = {"username": username, "password": password, "discord_username": discord_username, "program_type": program_type}
+@app.post("/api/login/create_token", tags=["login", "post"])
+async def create_login_token(user: User):
+    username = user.username
+    password = user.password
+    data_string = {"username": username, "password": password}
     return generate_token(data_string, "logged_in_token")
 
-@app.get("/api/login/check_token_validity", tags=["login", "get"])
+@app.post("/api/login/check_token_validity", tags=["login", "post"])
 async def login(login_query):
-    print(login_query)
     connection_string = jwt.decode(login_query, key=Settings.get_encryption_key(), algorithms=[Settings.get_algorithm()])
     username = connection_string["username"]
-    discord_username = connection_string["discord_username"]
     password = connection_string["password"]
-    program_type = connection_string["program_type"]
-    db_response = Database.select_user(program_type, username, password, discord_username)
+    db_response = Database.select_user(username, password)
     if db_response["Login_state"] == "logged_in":
         login_time = datetime.now().strftime('%m/%d/%y %H:%M:%S')
         connection_string["login_time"] = str(login_time)
@@ -58,17 +56,14 @@ async def login(login_query):
 async def check_windows_command(sentence):
     return general_check_command(sentence, "windows")
 
-
 @app.get("/api/discord/check_command", tags=["discord", "get"])
 async def check_discord_command(sentence):
     return general_check_command(sentence, "discord")
-
 
 @app.post("/api/user/create", tags=["user", "post"])
 async def create_new_user(username, password):
     db_response = Database.create_new_user(username, password)
     return JSONResponse(content=db_response, media_type="json")
-
 
 @app.put("/api/user/update/general", tags=["user", "put"])
 async def update_existing_user(userid, new_username, new_password):
@@ -85,12 +80,10 @@ async def update_existing_user(userid, new_password):
     db_response = Database.update_user(userid, new_password)
     return JSONResponse(content=db_response, media_type="json")
 
-
 @app.delete("/api/user/delete", tags=["user", "delete"])
 async def delete_existing_user(userid):
     db_response = Database.delete_user(userid)
     return JSONResponse(content=db_response, media_type="json")
-
 
 @app.post("/api/user/select", tags=["user", "post"])
 async def select_existing_user(program_type, username, password, discord_name="undefined"):
@@ -142,6 +135,9 @@ async def delete_user_token(tokenid, userid):
     Database.delete_user_token(tokenid, userid)
     return JSONResponse(content={"Result": "DONE"}, media_type="json")
 
+@app.post("/test")
+async def test_code(command: checkCommand):
+    print(command.queryString)
 
 if __name__ == "__main__":
     if not os.path.exists("eva-database.db"):

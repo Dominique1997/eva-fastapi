@@ -1,8 +1,8 @@
 import os
 import jwt
 import uvicorn
-from fastapi import *
 from dataModels import *
+from fastapi import FastAPI
 from settings import Settings
 from database import Database
 from datetime import datetime
@@ -52,13 +52,9 @@ async def login(login_query):
         connection_string["logout_time"] = str(datetime.strptime(login_time, '%m/%d/%y %H:%M:%S') + Settings.get_delta_time())
     return generate_token(connection_string, "validated_token")
 
-@app.get("/api/windows/check_command", tags=["windows", "get"])
-async def check_windows_command(sentence):
-    return general_check_command(sentence, "windows")
-
-@app.get("/api/discord/check_command", tags=["discord", "get"])
-async def check_discord_command(sentence):
-    return general_check_command(sentence, "discord")
+@app.get("/api/{program_type}/check_command", tags=["windows", "discord", "get"])
+async def check_command(sentence, program_type):
+    return general_check_command(sentence, program_type)
 
 @app.post("/api/user/create", tags=["user", "post"])
 async def create_new_user(username, password):
@@ -134,10 +130,6 @@ async def select_user_token(tokenid, userid):
 async def delete_user_token(tokenid, userid):
     Database.delete_user_token(tokenid, userid)
     return JSONResponse(content={"Result": "DONE"}, media_type="json")
-
-@app.post("/test")
-async def test_code(command: checkCommand):
-    print(command.queryString)
 
 if __name__ == "__main__":
     if not os.path.exists("eva-database.db"):

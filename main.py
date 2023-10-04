@@ -38,11 +38,12 @@ async def create_login_token(user: User):
     username = user.username
     password = user.password
     data_string = {"username": username, "password": password}
+
     return generate_token(data_string, "logged_in_token")
 
 @app.post("/api/login/check_token_validity", tags=["login", "post"])
-async def login(login_query):
-    connection_string = jwt.decode(login_query, key=Settings.get_encryption_key(), algorithms=[Settings.get_algorithm()])
+async def login(login_query: Login_query):
+    connection_string = jwt.decode(login_query.login_query, key=Settings.get_encryption_key(), algorithms=[Settings.get_algorithm()])
     username = connection_string["username"]
     password = connection_string["password"]
     db_response = Database.select_user(username, password)

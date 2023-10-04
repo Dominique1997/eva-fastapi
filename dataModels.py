@@ -8,3 +8,6 @@ class User(BaseModel):
 class Token(BaseModel):
     token: str
 
+class Login_query(BaseModel):
+    login_query: str
+

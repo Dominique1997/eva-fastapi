@@ -22,3 +22,11 @@ class Settings:
             days=cls.settings["login_time_days"],
             weeks=cls.settings["login_time_weeks"]
         )
+
+    @classmethod
+    def get_server_ip(cls):
+        return cls.settings["server_ip"]
+
+    @classmethod
+    def get_server_port(cls):
+        return cls.settings["server_port"]

@@ -141,4 +141,4 @@ async def delete_user_token(delete_server_token: DeleteServerToken):
 if __name__ == "__main__":
     if not os.path.exists("eva-database.db"):
         Database.new_database_setup()
-    uvicorn.run(app, host="0.0.0.0", port=80)
+    uvicorn.run(app, host=Settings.get_server_ip(), port=Settings.get_server_port())

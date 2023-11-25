@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from integrations.integration_wolframalpha import *
 from integrations.integration_ai import IntegrationAi as ai
+from integrations.integration_home_assistant import IntegrationHomeAssistant
 
 app = FastAPI()
 app.add_middleware(
@@ -52,7 +53,10 @@ async def login(login_query: LoginQuery):
     connection_string = jwt.decode(login_query.login_query, key=Settings.get_encryption_key(), algorithms=[Settings.get_algorithm()])
     username = connection_string["username"]
     password = connection_string["password"]
-    db_response = Database.select_user(username, password)
+    if Settings.test_mode():
+        db_response = Database.select_local_user(username, password)
+    else:
+        db_response = Database.select_extern_user(username, password)
     if db_response["Login_state"] == "logged_in":
         login_time = datetime.now().strftime('%m/%d/%y %H:%M:%S')
         connection_string["login_time"] = str(login_time)
@@ -65,80 +69,139 @@ async def check_command(check_command: CheckQuery):
 
 @app.post("/api/user/create", tags=["user", "post"])
 async def create_new_user(new_user: NewUser):
-    db_response = Database.create_new_user(new_user.username, new_user.password)
+    if Settings.test_mode():
+        db_response = Database.create_local_new_user(new_user.username, new_user.password)
+    else:
+        db_response = Database.create_extern_new_user(new_user.username, new_user.password)
     return JSONResponse(content=db_response, media_type="json")
 
 @app.put("/api/user/update/general", tags=["user", "put"])
 async def update_existing_user(update_user_general: UpdateUserGeneral):
-    db_response = Database.update_user(update_user_general.userid, update_user_general.new_username, update_user_general.new_password)
-    return JSONResponse(content=db_response, media_type="json")
-
-@app.patch("/api/user/update/username", tags=["user", "patch"])
-async def update_existing_user(update_user_name: UpdateUserName):
-    db_response = Database.update_user(update_user_name.userid, update_user_name.new_username)
-    return JSONResponse(content=db_response, media_type="json")
-
-@app.put("/api/user/update/password", tags=["user", "patch"])
-async def update_existing_user(update_user_password: UpdateUserPassword):
-    db_response = Database.update_user(update_user_password.userid, update_user_password.new_password)
+    if Settings.test_mode():
+        db_response = Database.update_local_user(update_user_general.userid, update_user_general.new_username, update_user_general.new_password)
+    else:
+        db_response = Database.update_extern_user(update_user_general.userid, update_user_general.new_username, update_user_general.new_password)
     return JSONResponse(content=db_response, media_type="json")
 
 @app.delete("/api/user/delete", tags=["user", "delete"])
 async def delete_existing_user(delete_user: DeleteUser):
-    db_response = Database.delete_user(delete_user.userid)
+    if Settings.test_mode():
+        db_response = Database.delete_local_user(delete_user.userid)
+    else:
+        db_response = Database.delete_extern_user(delete_user.userid)
     return JSONResponse(content=db_response, media_type="json")
 
 @app.post("/api/user/select", tags=["user", "post"])
 async def select_existing_user(select_user: SelectUser):
-    db_response = Database.select_user(select_user.program_type, select_user.username, select_user.password, select_user.discord_name)
+    if Settings.test_mode():
+        db_response = Database.select_local_user(select_user.username, select_user.password)
+    else:
+        db_response = Database.select_extern_user(select_user.username, select_user.password)
     return JSONResponse(content=db_response, media_type="json")
 
 @app.post("/api/token/add", tags=["token", "post"])
 async def add_user_token(add_token: AddToken):
-    Database.add_user_token(add_token.userID, add_token.server_ip, add_token.server_port, add_token.server_username, add_token.server_password, add_token.server_token)
-    return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    if Settings.test_mode():
+        db_response_count = Database.add_local_user_token(add_token.userID, add_token.server_ip, add_token.server_port, add_token.server_username, add_token.server_password, add_token.server_token)
+    else:
+        db_response_count = Database.add_extern_user_token(add_token.userID, add_token.server_ip, add_token.server_port,
+                                                          add_token.server_username, add_token.server_password,
+                                                          add_token.server_token)
+    if db_response_count == 0:
+        return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    return JSONResponse(content={"Result": "FAILED"}, media_type="json")
+
 
 @app.put("/api/token/update/general", tags=["token", "put"])
 async def update_user_token(update_token: UpdateTokenGeneral):
-    Database.update_user_token(update_token.tokenID, update_token.userID, update_token.server_ip, update_token.server_port, update_token.server_username, update_token.server_password, update_token.server_token)
-    return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    if Settings.test_mode():
+        db_response_count = Database.update_local_user_token(update_token.tokenID, update_token.userID, update_token.server_ip, update_token.server_port, update_token.server_username, update_token.server_password, update_token.server_token)
+    else:
+        db_response_count = Database.update_extern_user_token(update_token.tokenID, update_token.userID, update_token.server_ip, update_token.server_port, update_token.server_username, update_token.server_password, update_token.server_token)
+    if db_response_count == 0:
+        return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    return JSONResponse(content={"Result": "FAILED"}, media_type="json")
+
 
 @app.patch("/api/token/update/server_ip", tags=["token", "patch"])
 async def update_user_token_server_ip(update_users_token_ip: UpdateTokenServerIP):
-    Database.update_user_token(update_users_token_ip.tokenID, update_users_token_ip.userID, update_users_token_ip.server_ip)
-    return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    if Settings.test_mode():
+        db_response_count = Database.update_local_user_token(update_users_token_ip.tokenID, update_users_token_ip.userID, update_users_token_ip.server_ip)
+    else:
+        db_response_count = Database.update_extern_user_token(update_users_token_ip.tokenID, update_users_token_ip.userID, update_users_token_ip.server_ip)
+    if db_response_count == 0:
+        return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    return JSONResponse(content={"Result": "FAILED"}, media_type="json")
 
 @app.put("/api/token/update/server_port", tags=["token", "patch"])
 async def update_user_token(update_users_token_port: UpdateTokenServerPort):
-    Database.update_user_token(update_users_token_port.tokenID, update_users_token_port.userID, update_users_token_port.server_port)
-    return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    if Settings.test_mode():
+        db_response_count = Database.update_local_user_token(update_users_token_port.tokenID, update_users_token_port.userID, update_users_token_port.server_port)
+    else:
+        db_response_count = Database.update_extern_user_token(update_users_token_port.tokenID, update_users_token_port.userID, update_users_token_port.server_port)
+    if db_response_count == 0:
+        return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    return JSONResponse(content={"Result": "FAILED"}, media_type="json")
 
 @app.put("/api/token/update/server_username", tags=["token", "patch"])
 async def update_user_token(update_server_username: UpdateServerUsername):
-    Database.update_user_token(update_server_username.tokenID, update_server_username.userID, update_server_username.server_username)
-    return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    if Settings.test_mode():
+        db_response_count = Database.update_local_user_token(update_server_username.tokenID, update_server_username.userID, update_server_username.server_username)
+    else:
+        db_response_count = Database.update_extern_user_token(update_server_username.tokenID, update_server_username.userID, update_server_username.server_username)
+    if db_response_count == 0:
+        return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    return JSONResponse(content={"Result": "FAILED"}, media_type="json")
+
 
 @app.put("/api/token/update/server_password", tags=["token", "patch"])
 async def update_user_token(update_server_user_password: UpdateUserPassword):
-    Database.update_user_token(update_server_user_password.tokenID, update_server_user_password.userID, update_server_user_password.server_password)
-    return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    if Settings.test_mode():
+        db_response_count = Database.update_local_user_token(update_server_user_password.tokenID, update_server_user_password.userID, update_server_user_password.server_password)
+    else:
+        db_response_count = Database.update_extern_user_token(update_server_user_password.tokenID, update_server_user_password.userID, update_server_user_password.server_password)
+    if db_response_count == 0:
+        return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    return JSONResponse(content={"Result": "FAILED"}, media_type="json")
+
 
 @app.put("/api/token/update/server_token", tags=["token", "patch"])
 async def update_user_token(update_server_token: UpdateServerToken):
-    Database.update_user_token(update_server_token.tokenID, update_server_token.userID, update_server_token.server_token)
-    return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    if Settings.test_mode():
+        db_response_count = Database.update_local_user_token(update_server_token.tokenID, update_server_token.userID, update_server_token.server_token)
+    else:
+        db_response_count = Database.update_extern_user_token(update_server_token.tokenID, update_server_token.userID, update_server_token.server_token)
+    if db_response_count == 0:
+        return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    return JSONResponse(content={"Result": "FAILED"}, media_type="json")
 
 @app.post("/api/token/select", tags=["token", "post"])
 async def select_user_token(select_server_token: SelectServerToken):
-    Database.select_user_token(select_server_token.tokenid, select_server_token.userid)
-    return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    if Settings.test_mode():
+        db_response_count = Database.select_local_user_token(select_server_token.tokenid, select_server_token.userid)
+    else:
+        db_response_count = Database.select_extern_user_token(select_server_token.tokenid, select_server_token.userid)
+    if db_response_count == 0:
+        return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    return JSONResponse(content={"Result": "FAILED"}, media_type="json")
 
 @app.post("/api/token/delete", tags=["token", "post"])
 async def delete_user_token(delete_server_token: DeleteServerToken):
-    Database.delete_user_token(DeleteServerToken.tokenid, DeleteServerToken.userid)
-    return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    if Settings.test_mode():
+        db_response_count = Database.delete_local_user_token(DeleteServerToken.tokenid, DeleteServerToken.userid)
+    else:
+        db_response_count = Database.delete_extern_user_token(DeleteServerToken.tokenid, DeleteServerToken.userid)
+
+    if db_response_count == 0:
+        return JSONResponse(content={"Result": "DONE"}, media_type="json")
+    return JSONResponse(content={"Result": "FAILED"}, media_type="json")
+
+@app.get("/api/home_assistant/", tags=["home_assistant", "get"])
+async def home_assistant():
+    IntegrationHomeAssistant.load_information_entities()
 
 if __name__ == "__main__":
     if not os.path.exists("eva-database.db"):
-        Database.new_database_setup()
+        if Settings.test_mode():
+            Database.new_local_database_setup()
     uvicorn.run(app, host=Settings.get_server_ip(), port=Settings.get_server_port())

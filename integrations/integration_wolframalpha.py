@@ -1,6 +1,8 @@
 import requests
 import wolframalpha
+from integrations.integration_ai import IntegrationAi as ai
 from credentials import Credentials
+
 
 class IntegrationWolframAlpha():
     appID = Credentials.get_wolframalpha_app_id()

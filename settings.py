@@ -30,3 +30,27 @@ class Settings:
     @classmethod
     def get_server_port(cls):
         return cls.settings["server_port"]
+
+    @classmethod
+    def get_sql_server_ip(cls):
+        return cls.settings["sql_server_ip"]
+
+    @classmethod
+    def get_sql_server_port(cls):
+        return cls.settings["sql_server_port"]
+
+    @classmethod
+    def get_sql_server_username(cls):
+        return cls.settings["sql_server_username"]
+
+    @classmethod
+    def get_sql_server_password(cls):
+        return cls.settings["sql_server_password"]
+
+    @classmethod
+    def get_sql_server_database_name(cls):
+        return cls.settings["sql_server_database_name"]
+
+    @classmethod
+    def test_mode(cls):
+        return cls.settings["localhost_testing"]

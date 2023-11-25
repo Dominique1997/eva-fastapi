@@ -2,14 +2,13 @@ import json
 import nltk
 from random import choice
 from nltk.corpus import stopwords
-
 nltk.download('stopwords')
 
-class IntegrationAi():
+
+class IntegrationAi:
     intents = json.load(open("json_files/intents.json"))["intents"]
     recognize_data = {}
     ignore_stopwords = ["hi", "hello"]
-
 
     @classmethod
     def load_intents(cls):

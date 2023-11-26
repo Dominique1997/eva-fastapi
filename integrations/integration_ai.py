@@ -36,12 +36,11 @@ class IntegrationAi:
         IntegrationLogging.log(f'checking {sentence}')
         for data in cls.recognize_data:
             if received_from in cls.recognize_data[data]["accessible_by"]:
-                if len(set(str(sentence).split(" ")).intersection(set(cls.recognize_data[data]["pattern_words"]))) > 0:
-                    if len(set(str(sentence).split(" ")).intersection(set(cls.recognize_data[data]["pattern_words"]))) > highest_intersection_value:
-                        highest_intersection_value = len(set(str(sentence).split(" ")).intersection(set(cls.recognize_data[data]["pattern_words"])))
-                        highest_intersection_tag = data
-                        print(highest_intersection_value, data)
-                    IntegrationLogging.log(f'Intersection found with: {cls.recognize_data[data]["pattern_words"]}')
+                if len(set(str(sentence).split(" ")).intersection(set(cls.recognize_data[data]["pattern_words"]))) > highest_intersection_value:
+                    highest_intersection_value = len(set(str(sentence).split(" ")).intersection(set(cls.recognize_data[data]["pattern_words"])))
+                    highest_intersection_tag = data
+                    print(highest_intersection_value, data)
+                IntegrationLogging.log(f'Intersection found with: {cls.recognize_data[data]["pattern_words"]}')
         if highest_intersection_value != 0:
             cls.integration_home_assistant.check_tag(highest_intersection_tag)
             return {"forced_behaviour": True, "answer": choice(cls.recognize_data[data]["responses"]), "tag": data}

@@ -1,7 +1,8 @@
 import requests
 import wolframalpha
 from integrations.integration_ai import IntegrationAi as ai
-from credentials import Credentials
+from utilities.credentials import Credentials
+from integrations.integration_logging import IntegrationLogging
 
 
 class IntegrationWolframAlpha():
@@ -12,6 +13,4 @@ class IntegrationWolframAlpha():
     @classmethod
     def perform_check(cls, sentence):
         answer = requests.post(f"http://api.wolframalpha.com/v1/spoken?appid={cls.appID}&i={sentence}").text
-        if answer != cls.error_message:
-            ai.check_sentence(answer)
         return {"forced_behaviour": False, "answer": answer}

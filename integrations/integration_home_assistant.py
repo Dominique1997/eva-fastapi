@@ -1,24 +1,22 @@
 import datetime
 import json
-from credentials import Credentials
+from utilities.credentials import Credentials
 from requests import post, get
 
 class IntegrationHomeAssistant:
     main_url = "http://192.168.1.234:8123"
     ha_token = Credentials.get_home_assistant_token()
-    entities_information = []
+    list_services = []
 
     @classmethod
-    def load_information_entities(cls):
-        for entity in cls._get_api_states():
-            new_data = {}
-            if "entity_id" in entity:
-                new_data["entity_id"] = entity["entity_id"]
-                new_data["entity_type"] = str(entity["entity_id"]).split(".")[0]
-            if "friendly_name" in entity["attributes"]:
-                new_data["friendly_name"] = entity["attributes"]["friendly_name"]
-            cls.entities_information.append(new_data)
+    def load_information(cls):
+        cls.list_services = json.loads(cls._get_api_services())
 
+    @classmethod
+    def check_tag(cls, tag):
+        for service_data in cls.list_services:
+            if tag in service_data["services"]:
+                cls._post_api_services_by_domain_by_service(service_data["domain"], tag)
     @classmethod
     def _get_api(cls, url_suffix="/api/"):
         return cls.perform_get(url_suffix)
@@ -76,8 +74,8 @@ class IntegrationHomeAssistant:
         pass
 
     @classmethod
-    def _post_api_services_by_domain_by_service(cls):
-        pass
+    def _post_api_services_by_domain_by_service(cls, domain, service):
+        cls.perform_post(f"/api/services/{domain}/{service}")
 
     @classmethod
     def _post_api_template(cls):
@@ -99,7 +97,6 @@ class IntegrationHomeAssistant:
     def perform_post(cls, endpoint):
         response = post(cls.main_url+endpoint, headers=cls.get_header())
         if response.status_code == 200 or response.status_code == 201:
-            print(response.json())
             return response.json()
         else:
             print(response.status_code)
@@ -109,7 +106,7 @@ class IntegrationHomeAssistant:
         print("------------------------------------------------------------------------------------------------")
         response = get(cls.main_url+endpoint, headers=cls.get_header())
         if response.status_code == 200 or response.status_code == 201:
-            return response.json()
+            return json.dumps(response.json())
         else:
             print(response.status_code)
 

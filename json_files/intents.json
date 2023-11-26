@@ -1,37 +1,89 @@
 {
-  "intents": [
-    {
-      "tag": "greeting",
-      "patterns": [
-        "hi",
-        "hello",
-        "good morning"
-      ],
-      "responses": [
-        "hi how are you",
-        "hello"
-      ],
-      "accessible_by": [
-        "discord",
-        "windows"
-      ]
-    },
-    {
-      "tag": "minecraft_sword",
-      "patterns": [
-        "i need my sword",
-        "provide my sword",
-        "give me my sword",
-        "i do not see my sword",
-        "where is my sword"
-      ],
-      "responses": [
-        "sword is coming",
-        "sword will be provided"
-      ],
-      "accessible_by": [
-        "windows"
-      ]
-    }
-  ]
+    "intents":[
+        {
+            "tag":"greeting",
+            "patterns":[
+                "hi",
+                "hello",
+                "good morning"
+            ],
+            "responses":[
+                "hi how are you",
+                "hello"
+            ],
+            "accessible_by":[
+                "discord",
+                "windows"
+            ]
+        },
+        {
+            "tag":"minecraft_sword",
+            "patterns":[
+                "i need my sword",
+                "provide my sword",
+                "give me my sword",
+                "i do not see my sword",
+                "where is my sword"
+            ],
+            "responses":[
+                "sword is coming",
+                "sword will be provided"
+            ],
+            "accessible_by":[
+                "windows"
+            ]
+        },
+        {
+            "tag":"lg_master_youtube",
+            "patterns":[
+                "open youtube on lg master",
+                "start youtube on lg master",
+                "youtube lg master"
+            ],
+            "responses":[
+                "opening youtube on lg master",
+                "starting youtube on lg master"
+            ],
+            "accessible_by":[
+                "windows"
+            ]
+        },
+        {
+            "tag":"lg_master_disney_plus",
+            "patterns":[
+                "open disney plus on lg master",
+                "start disney plus on lg master",
+                "disney plus lg master"
+            ],
+            "responses":[
+                "opening disney plus on lg master",
+                "starting disney plus on lg master"
+            ],
+            "accessible_by":[
+                "windows"
+            ]
+        },
+        {
+            "tag":"lg_master_playstation_5",
+            "patterns":[
+                "open playstation 5 on lg master",
+                "start playstation 5 on lg master",
+                "playstation 5 lg master",
+                "open ps5 on lg master",
+                "start ps5 on lg master",
+                "ps5 lg master",
+                "open ps 5 on lg master",
+                "start ps 5 on lg master",
+                "ps 5 lg master",
+                "play a game lg master"
+            ],
+            "responses":[
+                "opening playstation 5 on lg master",
+                "starting playstation 5 on lg master"
+            ],
+            "accessible_by":[
+                "windows"
+            ]
+        }
+    ]
 }

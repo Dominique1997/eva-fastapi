@@ -34,7 +34,7 @@
             ]
         },
         {
-            "tag":"lg_master_youtube",
+            "tag":"lg_master_app_youtube",
             "patterns":[
                 "open youtube on lg master",
                 "start youtube on lg master",
@@ -46,10 +46,11 @@
             ],
             "accessible_by":[
                 "windows"
-            ]
+            ],
+            "trigger": "home-assistant"
         },
         {
-            "tag":"lg_master_disney_plus",
+            "tag":"lg_master_app_disney_plus",
             "patterns":[
                 "open disney plus on lg master",
                 "start disney plus on lg master",
@@ -61,10 +62,27 @@
             ],
             "accessible_by":[
                 "windows"
-            ]
+            ],
+            "trigger": "home-assistant"
         },
         {
-            "tag":"lg_master_playstation_5",
+            "tag":"lg_master_app_spotify",
+            "patterns":[
+                "open spotify on lg master",
+                "start spotify on lg master",
+                "spotify lg master"
+            ],
+            "responses":[
+                "opening spotify on lg master",
+                "starting spotify on lg master"
+            ],
+            "accessible_by":[
+                "windows"
+            ],
+            "trigger": "home-assistant"
+        },
+        {
+            "tag":"lg_master_source_playstation_5",
             "patterns":[
                 "open playstation 5 on lg master",
                 "start playstation 5 on lg master",
@@ -83,7 +101,40 @@
             ],
             "accessible_by":[
                 "windows"
-            ]
+            ],
+            "trigger": "home-assistant"
+        },
+        {
+            "tag":"lg_master_app_vtm_go",
+            "patterns":[
+                "open vtm go on lg master",
+                "start vtm go on lg master",
+                "disney vtm go master"
+            ],
+            "responses":[
+                "opening vtm go on lg master",
+                "starting vtm go on lg master"
+            ],
+            "accessible_by":[
+                "windows"
+            ],
+            "trigger": "home-assistant"
+        },
+        {
+            "tag":"lg_master_channel_vtm",
+            "patterns":[
+                "open vtm on lg master",
+                "start vtm on lg master",
+                "vtm lg master"
+            ],
+            "responses":[
+                "opening vtm on lg master",
+                "starting vtm on lg master"
+            ],
+            "accessible_by":[
+                "windows"
+            ],
+            "trigger": "home-assistant"
         }
     ]
 }

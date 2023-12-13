@@ -11,8 +11,8 @@ class IntegrationAi:
     intents = json.load(open("json_files/intents.json"))["intents"]
     integration_home_assistant = IntegrationHomeAssistant
     recognize_data = {}
-    ignore_stopwords = ["hi", "hello", "plus", "go"]
-    replace_words = [["vtm go", "VTM_GO"]]
+    ignore_stopwords = ["hi", "hello"]
+    replace_words = [["vtm go", "vtm_go"], ["disney plus, disney_plus"]]
 
     @classmethod
     def load_intents(cls):

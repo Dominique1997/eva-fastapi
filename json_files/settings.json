@@ -1,5 +1,5 @@
 {
-  "localhost_testing": false,
+  "localhost_testing": true,
   "encryption_key": "testing",
   "algorithm": "HS256",
   "login_time_seconds": 0,

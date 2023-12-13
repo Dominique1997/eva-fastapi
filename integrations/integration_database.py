@@ -1,9 +1,9 @@
 import sqlite3
 import mariadb
 from utilities.settings import Settings
+from integrations.integration_logging import IntegrationLogging
 
 class IntegrationDatabase:
-
     key = Settings.get_encryption_key()
     algorithm = Settings.get_algorithm()
     sql_server_ip = Settings.get_sql_server_ip()
@@ -12,181 +12,72 @@ class IntegrationDatabase:
     sql_server_password = Settings.get_sql_server_password()
     sql_server_database_name = Settings.get_sql_server_database_name()
 
-    sql_database_connection = mariadb.connect(
+    if Settings.test_mode():
+        db = sqlite3.connect("eva-database.db")
+    else:
+        db = mariadb.connect(
         user = sql_server_username,
         password = sql_server_password,
         host = f"{sql_server_ip}",
         port = sql_server_port,
         database = sql_server_database_name
     )
+        db.connect()
 
     @classmethod
-    def new_local_database_setup(cls):
-        with sqlite3.connect("../eva-database.db") as db:
-            create_new_table_users_statement = 'CREATE TABLE "users" (\
-                "userid"	INTEGER NOT NULL,\
-                "username"	TEXT NOT NULL,\
-                "password"	TEXT,\
-                PRIMARY KEY("userid" AUTOINCREMENT)\
-                )'
-            create_new_table_tokens_statement = 'CREATE TABLE "tokens" (\
-                "tokenid"	INTEGER NOT NULL,\
-                "server_ip"	TEXT NOT NULL,\
-                "server_port"	TEXT NOT NULL,\
-                "server_username"	TEXT,\
-                "server_password"	TEXT,\
-                "server_token"	TEXT NOT NULL,\
-                PRIMARY KEY("tokenid" AUTOINCREMENT)\
-                )'
-            db.execute(create_new_table_users_statement)
-            db.execute(create_new_table_tokens_statement)
-    @classmethod
-    def create_local_new_user(cls, username, password):
-        with sqlite3.connect("../eva-database.db") as db:
-            create_new_user_statement = f'INSERT INTO users(username,password) VALUES("{username}","{password}")'
-            answer_creation_user = db.execute(create_new_user_statement)
-            print(answer_creation_user.rowcount)
-            if answer_creation_user.rowcount > 0:
-                return {"confirmation": "User has been created"}
-            return {"error": "User could not be created"}
+    def new_database_setup(cls):
+        create_new_table_users_statement = 'CREATE TABLE IF NOT EXISTS "users" (\
+            "userid"	INTEGER NOT NULL,\
+            "username"	TEXT NOT NULL,\
+            "password"	TEXT,\
+            PRIMARY KEY("userid" AUTOINCREMENT)\
+            )'
+        create_new_table_tokens_statement = 'CREATE TABLE IF NOT EXISTS "tokens" (\
+            "tokenid"	INTEGER NOT NULL,\
+            "server_ip"	TEXT NOT NULL,\
+            "server_port"	TEXT NOT NULL,\
+            "server_username"	TEXT,\
+            "server_password"	TEXT,\
+            "server_token"	TEXT NOT NULL,\
+            PRIMARY KEY("tokenid" AUTOINCREMENT)\
+            )'
+        IntegrationLogging.log("Creating table users")
+        cls.db.execute(create_new_table_users_statement)
+        IntegrationLogging.log("Creating table tokens")
+        cls.db.execute(create_new_table_tokens_statement)
 
     @classmethod
-    def delete_local_user(cls, userid):
-        with sqlite3.connect("../eva-database.db") as db:
-            remove_user_statement = f"DELETE FROM users WHERE userid == {userid}"
-            answer_removing_user = db.execute(remove_user_statement)
-            print(answer_removing_user.rowcount)
-            if answer_removing_user.rowcount > 0:
-                return {"confirmation": "User has been removed"}
-            return {"error": "User could not be removed"}
-
-    @classmethod
-    def update_local_user(cls, userid, new_username, new_password):
-        with sqlite3.connect("../eva-database.db") as db:
-            update_user_statement = f'UPDATE users SET username="{new_username}", password="{new_password}" WHERE userid="{userid}"'
-            answer_updating_user = db.execute(update_user_statement)
-            if answer_updating_user.rowcount > 0:
-                return {"confirmation": "User has been updated"}
-            return {"error": "User could not be updated"}
+    def create_new_user(cls, new_username, new_password):
+        IntegrationLogging.log("Creating new user")
+        create_new_user_statement = f"INSERT INTO users(username,password) VALUES ('{new_username}', '{new_password}')"
+        return cls._perform_sql_command(create_new_user_statement).rowcount
 
 
     @classmethod
-    def select_local_user(cls, username, password):
-        with sqlite3.connect("../eva-database.db") as db:
-            db_cursor = db.cursor()
-            select_user_statement = f'SELECT * FROM users WHERE username = "{username}" AND password = "{password}"'
-            db_data = db_cursor.execute(select_user_statement).fetchall()
-            print(db_cursor.execute(select_user_statement).rowcount)
-            if len(db_data) > 1 or len(db_data) == 0:
-                return {"Login_state": "login_error", "Message": "User not found"}
-            return {"Login_state": "logged_in", "Message": "User is found"}
-
-    #RETURN STATE NEEDS TO BE UPDATED
-    @classmethod
-    def add_local_user_token(cls, userid, server_ip, server_port, server_username, server_password, server_token):
-        with sqlite3.connect("../eva-database.db") as db:
-            db_cursor = db.cursor()
-            add_user_token_statement = f"INSERT INTO tokens(userID, server_ip, server_port, server_username, server_password, server_token)" \
-                      f"VALUES('{userid}','{server_ip}',' {server_port}', '{server_username}', '{server_password}'," \
-                      f"'{server_token}')"
-            return db_cursor.execute(add_user_token_statement).rowcount
+    def read_existing_user(cls, read_username, read_password):
+        IntegrationLogging.log("Reading existing user")
+        read_existing_user_statement = f"SELECT userid FROM users WHERE username='{read_username}' and password='{read_password}'"
+        return cls._perform_sql_command(read_existing_user_statement).fetchall()
 
     @classmethod
-    def update_local_user_token(cls, tokenid, userid, server_ip, server_port, server_username, server_password, server_token):
-        with sqlite3.connect("../eva-database.db") as db:
-            db_cursor = db.cursor()
-            add_user_token_statement = f'UPDATE tokens ' \
-                                       f'SET server_ip="{server_ip}",' \
-                                       f'server_port="{server_port}",' \
-                                       f'server_username="{server_username}",' \
-                                       f'server_password="{server_password}",' \
-                                       f'server_token="{server_token}"' \
-                                       f'WHERE userID="{userid}" and tokenid="{tokenid}"'
-            return db_cursor.execute(add_user_token_statement).rowcount
+    def update_existing_user(cls, userId, new_username, new_password):
+        IntegrationLogging.log("Updating existing user")
+        update_existing_user_statement = f"UPDATE users SET username='{new_username}', password='{new_password}' WHERE userid='{userId}'"
+        return cls._perform_sql_command(update_existing_user_statement).rowcount
 
     @classmethod
-    def delete_local_user_token(cls, tokenid, userid):
-        with sqlite3.connect("../eva-database.db") as db:
-            db_cursor = db.cursor()
-            delete_user_token_statement = f"DELETE FROM tokens WHERE userid == {userid} and tokenid == {tokenid}"
-            return db_cursor.execute(delete_user_token_statement).rowcount
+    def delete_existing_user(cls, userId, username, password):
+        IntegrationLogging.log("Deleting existing user")
+        delete_existing_user_statement = f"DELETE FROM users WHERE userid={userId} and username='{username}' and password='{password}'"
+        return cls._perform_sql_command(delete_existing_user_statement).rowcount
 
     @classmethod
-    def select_local_user_token(cls, tokenid, userid):
-        with sqlite3.connect("../eva-database.db") as db:
-            db_cursor = db.cursor()
-            select_user_token_statement = f'SELECT * FROM tokens ' \
-                                       f'WHERE userID="{userid}" and tokenid="{tokenid}"'
-            return db_cursor.execute(select_user_token_statement).rowcount
-
+    def reset_tables(cls):
+        IntegrationLogging.log("Resetting database")
+        reset_tables_statement = "TRUNCATE users; TRUNCATE tokens;"
+        cls._perform_sql_command(reset_tables_statement)
     @classmethod
-    def create_extern_new_user(cls, username, password):
-        with cls.sql_database_connection.cursor() as cursor:
-            cursor.execute(f"call create_user(?,?)", (username, password))
-            cls.sql_database_connection.commit()
-
-    @classmethod
-    def delete_extern_user(cls, userid):
-        with sqlite3.connect("../eva-database.db") as db:
-            remove_user_statement = f"DELETE FROM users WHERE userid == {userid}"
-            answer_removing_user = db.execute(remove_user_statement)
-            cls.sql_database_connection.commit()
-
-    @classmethod
-    def update_extern_user(cls, userid, new_username, new_password):
-        with sqlite3.connect("../eva-database.db") as db:
-            update_user_statement = f'UPDATE users SET username="{new_username}", password="{new_password}" WHERE userid="{userid}"'
-            answer_updating_user = db.execute(update_user_statement)
-            cls.sql_database_connection.commit()
-
-
-    @classmethod
-    def select_extern_user(cls, username, password):
-        with sqlite3.connect("../eva-database.db") as db:
-            db_cursor = db.cursor()
-            select_user_statement = f'SELECT * FROM users WHERE username = "{username}" AND password = "{password}"'
-            db_data = db_cursor.execute(select_user_statement).fetchall()
-            return db_data
-
-    # RETURN STATE NEEDS TO BE UPDATED
-    @classmethod
-    def add_extern_user_token(cls, userid, server_ip, server_port, server_username, server_password, server_token):
-        with sqlite3.connect("../eva-database.db") as db:
-            db_cursor = db.cursor()
-            add_user_token_statement = f"INSERT INTO tokens(userID, server_ip, server_port, server_username, server_password, server_token)" \
-                                       f"VALUES('{userid}','{server_ip}',' {server_port}', '{server_username}', '{server_password}'," \
-                                       f"'{server_token}')"
-            db_cursor.execute(add_user_token_statement)
-            cls.sql_database_connection.commit()
-
-
-    @classmethod
-    def update_extern_user_token(cls, tokenid, userid, server_ip, server_port, server_username, server_password,
-                                server_token):
-        with sqlite3.connect("../eva-database.db") as db:
-            db_cursor = db.cursor()
-            update_user_token_statement = f'UPDATE tokens ' \
-                                       f'SET server_ip="{server_ip}",' \
-                                       f'server_port="{server_port}",' \
-                                       f'server_username="{server_username}",' \
-                                       f'server_password="{server_password}",' \
-                                       f'server_token="{server_token}"' \
-                                       f'WHERE userID="{userid}" and tokenid="{tokenid}"'
-            db_cursor.execute(update_user_token_statement)
-            cls.sql_database_connection.commit()
-
-    @classmethod
-    def delete_extern_user_token(cls, tokenid, userid):
-        with sqlite3.connect("../eva-database.db") as db:
-            db_cursor = db.cursor()
-            delete_user_token_statement = f"DELETE FROM tokens WHERE userid == {userid} and tokenid == {tokenid}"
-            db_cursor.execute(delete_user_token_statement)
-            cls.sql_database_connection.commit()
-
-    @classmethod
-    def select_extern_user_token(cls, tokenid, userid):
-        with sqlite3.connect("../eva-database.db") as db:
-            db_cursor = db.cursor()
-            select_user_token_statement = f'SELECT * FROM tokens ' \
-                                       f'WHERE userID="{userid}" and tokenid="{tokenid}"'
-            return db_cursor.execute(select_user_token_statement)
+    def _perform_sql_command(cls, sql_command):
+        db_result = cls.db.execute(sql_command)
+        cls.db.commit()
+        return db_result

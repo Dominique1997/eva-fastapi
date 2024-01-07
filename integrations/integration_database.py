@@ -1,5 +1,4 @@
 import sqlite3
-import mariadb
 from utilities.settings import Settings
 from integrations.integration_logging import IntegrationLogging
 
@@ -12,18 +11,7 @@ class IntegrationDatabase:
     sql_server_password = Settings.get_sql_server_password()
     sql_server_database_name = Settings.get_sql_server_database_name()
 
-    if Settings.test_mode():
-        db = sqlite3.connect("eva-database.db")
-    else:
-        db = mariadb.connect(
-        user = sql_server_username,
-        password = sql_server_password,
-        host = f"{sql_server_ip}",
-        port = sql_server_port,
-        database = sql_server_database_name
-    )
-        db.connect()
-
+    db = sqlite3.connect("eva_database.db")
     @classmethod
     def new_database_setup(cls):
         create_new_table_users_statement = 'CREATE TABLE IF NOT EXISTS "users" (\
@@ -42,7 +30,7 @@ class IntegrationDatabase:
             PRIMARY KEY("tokenid" AUTOINCREMENT)\
             )'
         IntegrationLogging.log("Creating table users")
-        cls.db.execute(create_new_table_users_statement)
+        cls.db.cursor().execute(create_new_table_users_statement)
         IntegrationLogging.log("Creating table tokens")
         cls.db.execute(create_new_table_tokens_statement)
 
@@ -52,12 +40,11 @@ class IntegrationDatabase:
         create_new_user_statement = f"INSERT INTO users(username,password) VALUES ('{new_username}', '{new_password}')"
         return cls._perform_sql_command(create_new_user_statement).rowcount
 
-
     @classmethod
     def read_existing_user(cls, read_username, read_password):
         IntegrationLogging.log("Reading existing user")
         read_existing_user_statement = f"SELECT userid FROM users WHERE username='{read_username}' and password='{read_password}'"
-        return cls._perform_sql_command(read_existing_user_statement).fetchall()
+        return cls._perform_sql_command(read_existing_user_statement).fetchone()
 
     @classmethod
     def update_existing_user(cls, userId, new_username, new_password):
@@ -74,8 +61,11 @@ class IntegrationDatabase:
     @classmethod
     def reset_tables(cls):
         IntegrationLogging.log("Resetting database")
-        reset_tables_statement = "TRUNCATE users; TRUNCATE tokens;"
-        cls._perform_sql_command(reset_tables_statement)
+        drop_table_users = "DROP table users"
+        cls._perform_sql_command(drop_table_users)
+        drop_table_tokens = "DROP table tokens;"
+        cls._perform_sql_command(drop_table_tokens)
+        cls.new_database_setup()
     @classmethod
     def _perform_sql_command(cls, sql_command):
         db_result = cls.db.execute(sql_command)

@@ -18,6 +18,7 @@ app.add_middleware(
 )
 ai.load_intents()
 
+
 def encode_data(data_string):
     return jwt.encode(data_string, algorithm=Settings.get_algorithm(), key=Settings.get_encryption_key())
 
@@ -25,10 +26,12 @@ def encode_data(data_string):
 def decode_data(encoded_data):
     return jwt.decode(encoded_data, algorithms=Settings.get_algorithm(), key=Settings.get_encryption_key())
 
+
 @app.get("/api/status", tags=["get", "status"])
 async def get_api_state():
     IntegrationLogging.log("Checking api state")
     return JSONResponse(content={"api_state": True}, status_code=200, media_type="application/json")
+
 
 @app.post("/api/user/create", tags=["post", "user"])
 async def post_user_create(createUser: CreateUser):
@@ -41,16 +44,18 @@ async def post_user_create(createUser: CreateUser):
     IntegrationLogging.log("Unsuccesfull creation of user")
     return JSONResponse(content={"User creation:": False}, status_code=404, media_type="application/json")
 
+
 @app.post("/api/user/read", tags=["post", "user"])
-async def post_user_read(readUser: ReadUser):
-    read_username = readUser.username
-    read_password = readUser.password
+async def post_user_read(token: Token, username: str, password: str):
+    read_username = username
+    read_password = password
     db_result = IntegrationDatabase.read_existing_user(read_username, read_password)
     if len(db_result) == 1:
         IntegrationLogging.log("Succesfull reading of user")
-        return JSONResponse(content={"UserId:": db_result[0][0]}, status_code=200, media_type="application/json")
+        return JSONResponse(content={"UserId:": db_result[0]}, status_code=200, media_type="application/json")
     IntegrationLogging.log("Unsuccesfull reading of user")
     return JSONResponse(content={"UserId:": -1}, status_code=404, media_type="application/json")
+
 
 @app.post("/api/user/update", tags=["post", "user"])
 async def post_user_update(updateUser: UpdateUser):
@@ -64,6 +69,7 @@ async def post_user_update(updateUser: UpdateUser):
     IntegrationLogging.log("Unsuccesfull updating of user")
     return JSONResponse(content={"User update:": False}, status_code=404, media_type="application/json")
 
+
 @app.post("/api/user/delete", tags=["post", "user"])
 async def post_user_delete(deleteUser: DeleteUser):
     userId = deleteUser.userId
@@ -75,6 +81,17 @@ async def post_user_delete(deleteUser: DeleteUser):
         return JSONResponse(content={"User deletion:": True}, status_code=200, media_type="application/json")
     IntegrationLogging.log("Unsuccesfull deleting of user")
     return JSONResponse(content={"User deletion:": False}, status_code=404, media_type="application/json")
+
+@app.post("/api/token/generate", tags=["post", "token"])
+async def post_token_generate(tokenData: dict):
+    return encode_data(tokenData)
+
+@app.post("/api/ai/check", tags=["post", "ai"])
+async def get_command_check(readCommand: ReadCommand):
+    OSType = readCommand.OSType
+    command = readCommand.command
+    return ai.check_sentence(command, OSType)
+
 
 @app.post("/api/tables/reset", tags=["post", "tables"])
 async def tables_reset():

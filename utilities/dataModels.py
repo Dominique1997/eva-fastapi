@@ -5,25 +5,23 @@ from utilities.settings import Settings
 class Token(BaseModel):
     token: str = ""
 
+class CreateUser(Token):
+    username: str = ""
+    password: str = ""
 
-class User(Token):
-    username: str
-    password: str
+class ReadUser(Token):
+    userID: str = ""
+    username: str = ""
+    password: str = ""
 
-class CreateUser(User):
-    User.username = ""
-    User.password = ""
+class UpdateUser(Token):
+    username: str = ""
+    password: str = ""
 
-class ReadUser(User):
-    User.username = ""
-    User.password = ""
+class DeleteUser(Token):
+    username: str = ""
+    password: str = ""
 
-class UpdateUser(User):
-    User.username = ""
-    User.password = ""
-    userId: str = "0"
-
-class DeleteUser(User):
-    User.username = ""
-    User.password = ""
-    userId: str = "0"
+class ReadCommand(Token):
+    OSType: str = ""
+    command: str = ""

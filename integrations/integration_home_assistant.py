@@ -4,7 +4,7 @@ from utilities.credentials import Credentials
 from requests import post, get
 
 class IntegrationHomeAssistant:
-    main_url = "http://192.168.1.234:8123"
+    baseUrl = "http://192.168.1.234:8123"
     ha_token = Credentials.get_home_assistant_token()
     list_services = []
 
@@ -95,7 +95,7 @@ class IntegrationHomeAssistant:
 
     @classmethod
     def perform_post(cls, endpoint):
-        response = post(cls.main_url+endpoint, headers=cls.get_header())
+        response = post(cls.baseUrl+endpoint, headers=cls.get_header())
         if response.status_code == 200 or response.status_code == 201:
             return response.json()
         else:
@@ -104,7 +104,7 @@ class IntegrationHomeAssistant:
     @classmethod
     def perform_get(cls, endpoint):
         print("------------------------------------------------------------------------------------------------")
-        response = get(cls.main_url+endpoint, headers=cls.get_header())
+        response = get(cls.baseUrl+endpoint, headers=cls.get_header())
         if response.status_code == 200 or response.status_code == 201:
             return json.dumps(response.json())
         else:

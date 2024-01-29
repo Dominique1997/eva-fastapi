@@ -1,5 +1,5 @@
 {
-    "intents":[
+    "intents": [
         {
             "tag":"greeting",
             "patterns":[
@@ -12,8 +12,10 @@
                 "hello"
             ],
             "accessible_by":[
-                "discord",
-                "windows"
+                "windows",
+                "linux",
+                "android",
+                "ios"
             ]
         },
         {
@@ -30,7 +32,8 @@
                 "sword will be provided"
             ],
             "accessible_by":[
-                "windows"
+                "windows",
+                "linux"
             ]
         },
         {
@@ -45,9 +48,12 @@
                 "starting youtube on lg master"
             ],
             "accessible_by":[
-                "windows"
+                "windows",
+                "linux",
+                "ios",
+                "android"
             ],
-            "trigger": "home-assistant"
+            "trigger": ["integration_home_assistant"]
         },
         {
             "tag":"lg_master_app_disney_plus",
@@ -61,9 +67,12 @@
                 "starting disney plus on lg master"
             ],
             "accessible_by":[
-                "windows"
+                "windows",
+                "linux",
+                "ios",
+                "android"
             ],
-            "trigger": "home-assistant"
+            "trigger": ["integration_home_assistant"]
         },
         {
             "tag":"lg_master_app_spotify",
@@ -77,9 +86,12 @@
                 "starting spotify on lg master"
             ],
             "accessible_by":[
-                "windows"
+                "windows",
+                "linux",
+                "ios",
+                "android"
             ],
-            "trigger": "home-assistant"
+            "trigger": ["integration_home_assistant"]
         },
         {
             "tag":"lg_master_source_playstation_5",
@@ -100,9 +112,12 @@
                 "starting playstation 5 on lg master"
             ],
             "accessible_by":[
-                "windows"
+                "windows",
+                "linux",
+                "ios",
+                "android"
             ],
-            "trigger": "home-assistant"
+            "trigger": ["integration_home_assistant"]
         },
         {
             "tag":"lg_master_app_vtm_go",
@@ -116,9 +131,12 @@
                 "starting vtm go on lg master"
             ],
             "accessible_by":[
-                "windows"
+                "windows",
+                "linux",
+                "ios",
+                "android"
             ],
-            "trigger": "home-assistant"
+            "trigger": ["integration_home_assistant"]
         },
         {
             "tag":"lg_master_channel_vtm",
@@ -132,9 +150,76 @@
                 "starting vtm on lg master"
             ],
             "accessible_by":[
-                "windows"
+                "windows",
+                "linux",
+                "ios",
+                "android"
             ],
-            "trigger": "home-assistant"
+            "trigger": ["integration_home_assistant"]
+        },
+        {
+            "tag":"recipe_by_name",
+            "patterns":[
+                "how to make a",
+                "give me the recipe for a",
+                "how to make an",
+                "give me the recipe for an"
+            ],
+            "responses":
+            {
+                "meal": [
+                "{mealName}. This is a {areaName} dish. The ingredients for this are {mealIngredients}. The instructions are {mealInstructions}"
+            ],
+                "cocktail": [
+                "{drinkName}. Please serve this in a {drinkGlass}. The instructions are {drinkInstructions}",
+                "Your chosen drink is {drinkName}. For this delicious drink I recommend to use a {drinkGlass}. To make this great drink follow the provided instructions: {drinkInstructions}"
+            ],
+                "failure_response": [
+                "There is no recipe available for {recipe_name}"
+            ]
+            },
+            "accessible_by":[
+                "windows",
+                "linux",
+                "ios",
+                "android",
+                "discord"
+            ],
+            "trigger": ["integration_themealdb", "integration_thecocktaildb"]
+        },
+        {
+            "tag":"upcoming_holidays",
+            "patterns":[
+                "what are the upcoming holidays"
+            ],
+            "responses": [
+                "{holidayName}. This is a {holidayType} and will be held on {holidayDate}."
+            ],
+            "accessible_by":[
+                "windows",
+                "linux",
+                "ios",
+                "android",
+                "discord"
+            ],
+            "trigger": ["integration_calendarific"]
+        },
+        {
+            "tag":"movie_information",
+            "patterns":[
+                "get me information about the movie"
+            ],
+            "responses": [
+                "{movieTitle}. This is a {movieGenre} from {movieYear}. The plot goes as follows: {moviePlot}"
+            ],
+            "accessible_by":[
+                "windows",
+                "linux",
+                "ios",
+                "android",
+                "discord"
+            ],
+            "trigger": ["integration_omdb"]
         }
     ]
 }

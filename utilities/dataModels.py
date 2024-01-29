@@ -2,26 +2,24 @@ from pydantic import BaseModel
 from utilities.settings import Settings
 
 
-class Token(BaseModel):
-    token: str = ""
-
-class CreateUser(Token):
+class CreateUser(BaseModel):
     username: str = ""
     password: str = ""
 
-class ReadUser(Token):
+class ReadUser(BaseModel):
+    username: str = ""
+    password: str = ""
+
+class UpdateUser(BaseModel):
     userID: str = ""
     username: str = ""
     password: str = ""
 
-class UpdateUser(Token):
+class DeleteUser(BaseModel):
+    userID: str = ""
     username: str = ""
     password: str = ""
 
-class DeleteUser(Token):
-    username: str = ""
-    password: str = ""
-
-class ReadCommand(Token):
+class ReadCommand(BaseModel):
     OSType: str = ""
     command: str = ""

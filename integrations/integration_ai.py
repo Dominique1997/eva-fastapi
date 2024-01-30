@@ -7,14 +7,19 @@ from integrations.integration_thecocktaildb import IntegrationTheCocktailDB
 from integrations.integration_themealdb import IntegrationTheMealDB
 from integrations.integration_calendarific import IntegrationCalendarific
 from integrations.integration_omdb import IntegrationOMDB
+from integrations.integration_theaudiodb import IntegrationTheAudioDB
 
 
 #TO BE INTEGRATED STILL
+
+#code needs to be fixed
 #from integrations.integration_tvdb import IntegrationTVDB
-#from integrations.integration_openlibrary import IntegrationOpenLibrary
 #from integrations.integration_openmeteo import IntegrationOpenMeteo
 #from integrations.integration_pokemon import IntegrationPokemon
-#from integrations.integration_theaudiodb import IntegrationTheAudioDB
+
+#recheck needed
+#from integrations.integration_openlibrary import IntegrationOpenLibrary
+
 
 nltk.download('stopwords')
 
@@ -43,7 +48,8 @@ class IntegrationAi:
                     if str(pattern).__contains__(replace_word[0]):
                         pattern = str(pattern).replace(replace_word[0], replace_word[1])
                 combined_patterns += pattern + " "
-            cls.recognize_data[intent["tag"]]["pattern_words"] = set(word for word in str(combined_patterns).split(" ") if word in cls.ignore_stopwords or word not in stopwords.words())
+            cls.recognize_data[intent["tag"]]["pattern_words"] = set(word for word in str(combined_patterns).split(" "))
+            #if word in cls.ignore_stopwords or word not in stopwords.words()
     @classmethod
     def check_sentence(cls, sentence, received_from=None):
         highest_intersection_value = 0
@@ -73,8 +79,8 @@ class IntegrationAi:
                 if "integration_home_assistant" in triggers:
                     IntegrationHomeAssistant.check_tag(highest_intersection_tag)
                 if "integration_themealdb" in triggers or "integration_thecocktaildb" in triggers:
-                    mealName = ' '.join([word for word in str(sentence).split(" ") if
-                                         word in cls.ignore_stopwords or word not in stopwords.words() and word not in highest_pattern_words]).strip()
+                    mealName = ' '.join([word for word in str(sentence).split(" ") if word not in highest_pattern_words]).strip()
+                    #if word in cls.ignore_stopwords or word not in stopwords.words() and word not in highest_pattern_words
                     mealResponse = IntegrationTheMealDB.search_meal_by_name(mealName)
                     mealStatuscode = mealResponse.status_code
                     if mealStatuscode == 200:
@@ -110,8 +116,8 @@ class IntegrationAi:
                                         "answer": answerOption.format(**meal_data),
                                         "tag": highest_intersection_tag}
                         except:
-                            cocktailName = ' '.join([word for word in str(sentence).split(" ") if
-                                                     word in cls.ignore_stopwords or word not in stopwords.words() and word not in highest_pattern_words]).strip()
+                            cocktailName = ' '.join([word for word in str(sentence).split(" ") if word not in highest_pattern_words]).strip()
+                            #if word in cls.ignore_stopwords or word not in stopwords.words() and word not in highest_pattern_words
                             cocktailResponse = IntegrationTheCocktailDB.search_cocktail_by_name(cocktailName)
                             cocktailStatuscode = cocktailResponse.status_code
                             drinks = cocktailResponse.json()["drinks"]
@@ -166,21 +172,47 @@ class IntegrationAi:
                                         "tag": highest_intersection_tag
                                         }
 
-                if "integration_omdb" in triggers:
-                    movieName = ' '.join([word for word in str(sentence).split(" ") if
-                                             word in cls.ignore_stopwords or word not in stopwords.words() and word not in highest_pattern_words]).strip()
+                if "integration_omdb" in triggers or "integration_tvdb" in triggers:
+                    movieName = ' '.join([word for word in str(sentence).split(" ") if word not in highest_pattern_words]).strip()
+                    #if word in cls.ignore_stopwords or word not in stopwords.words() and word not in highest_pattern_words
                     movieInformation = IntegrationOMDB.search_by_title(movieName).json()
-                    movieTitle = movieInformation["Title"]
-                    movieYear = movieInformation["Year"]
-                    movieGenre = movieInformation["Genre"]
-                    moviePlot = movieInformation["Plot"]
+                    try:
+                        movieTitle = movieInformation["Title"]
+                        movieYear = movieInformation["Year"]
+                        movieGenre = movieInformation["Genre"]
+                        moviePlot = movieInformation["Plot"]
 
-                    movieData = {"movieTitle": movieTitle, "movieYear": movieYear, "movieGenre": movieGenre, "moviePlot": moviePlot}
-                    response = str(choice(cls.recognize_data[highest_intersection_tag]["responses"])).format(**movieData)
-                    return {"forced_behaviour": True,
-                            "answer": response,
-                            "tag": highest_intersection_tag
-                            }
+                        movieData = {"movieTitle": movieTitle, "movieYear": movieYear, "movieGenre": movieGenre, "moviePlot": moviePlot}
+                        response = str(choice(cls.recognize_data[highest_intersection_tag]["responses"]["movie"])).format(**movieData)
+                        return {"forced_behaviour": True,
+                                "answer": response,
+                                "tag": highest_intersection_tag
+                                }
+                    except:
+                        return {"forced_behaviour": True,
+                                "answer": str(choice(cls.recognize_data[highest_intersection_tag]["responses"]["failure"])).format(**{"movieTitle": movieName}),
+                                "tag": highest_intersection_tag
+                                }
+                if "integration_audiodb" in triggers:
+                    artistName = ' '.join([word for word in str(sentence).split(" ") if word not in highest_pattern_words]).strip()
+                    #if word in cls.ignore_stopwords or word not in stopwords.words() and
+                    try:
+                        artistInformation = \
+                        IntegrationTheAudioDB.search_artist_details_by_artist_name(artistName).json()["artists"][0]
+                        artistName = artistInformation["strArtist"]
+                        artistBiography = artistInformation["strBiographyEN"]
+
+                        artistData = {"artistName": artistName, "artistBiography": artistBiography}
+                        response = str(choice(cls.recognize_data[highest_intersection_tag]["responses"]["success"])).format(**artistData)
+                        return {"forced_behaviour": True,
+                                "answer": response,
+                                "tag": highest_intersection_tag
+                                }
+                    except:
+                        return {"forced_behaviour": True,
+                                "answer": str(choice(cls.recognize_data[highest_intersection_tag]["responses"]["failure"])).format(**{"artistName": artistName}),
+                                "tag": highest_intersection_tag
+                                }
             return {"forced_behaviour": True, "answer": choice(cls.recognize_data[highest_intersection_tag]["responses"]), "tag": highest_intersection_tag}
         return {"forced_behaviour": False, "answer": "No result is found", "tag": "error"}
 

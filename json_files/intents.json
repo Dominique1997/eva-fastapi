@@ -205,13 +205,15 @@
             "trigger": ["integration_calendarific"]
         },
         {
-            "tag":"movie_information",
+            "tag":"video_information",
             "patterns":[
                 "get me information about the movie"
             ],
-            "responses": [
-                "{movieTitle}. This is a {movieGenre} from {movieYear}. The plot goes as follows: {moviePlot}"
-            ],
+            "responses": {
+                "movie": [ "{movieTitle}. This is a {movieGenre} from {movieYear}. The plot goes as follows: {moviePlot}"],
+                "tv": ["{tvTitle}. This is a {tvGenre} from {tvYear}. The plot goes as follows: {tvPlot}"],
+                "failure": ["There is no movie or tv show avaiable under the name {movieTitle}"]
+            },
             "accessible_by":[
                 "windows",
                 "linux",
@@ -220,6 +222,25 @@
                 "discord"
             ],
             "trigger": ["integration_omdb"]
+        },
+        {
+            "tag":"audio_information",
+            "patterns":[
+                "who is"
+            ],
+            "responses":
+            {
+                "success": ["{artistName}. {artistBiography}"],
+                "failure": ["There is no information about {artistName}"]
+            },
+            "accessible_by":[
+                "windows",
+                "linux",
+                "ios",
+                "android",
+                "discord"
+            ],
+            "trigger": ["integration_audiodb"]
         }
     ]
 }

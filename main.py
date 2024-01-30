@@ -161,6 +161,15 @@ async def thecocktaildb_search_non_alcoholic_cocktails(country_code = get_countr
 async def omdbapi_search_by_title(movieTitle: str):
     return JSONResponse(content=IntegrationOMDB.search_by_title(movieTitle).json(), status_code=200, media_type="application/json")
 
+@app.get("/api/openlibrary/search_by_title", tags=["openlibrary"])
+async def openlibrary_search_by_title(bookTitle: str):
+    return JSONResponse(content=IntegrationOpenLibrary.search_by_title(bookTitle).json(), status_code=200, media_type="application/json")
+
+
+@app.get("/api/theaudiodb/search_artist_details_by_artist_name", tags=["theaudiodb"])
+async def theaudiodb_search_artist_details_by_artist_name(artistName: str):
+    return JSONResponse(content=IntegrationTheAudioDB.search_artist_details_by_artist_name(artistName).json(), status_code=200, media_type="application/json")
+
 
 @app.post("/api/tables/reset", tags=["tables"])
 async def tables_reset():

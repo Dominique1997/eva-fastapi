@@ -5,29 +5,29 @@ from utilities.credentials import Credentials
 
 class IntegrationTheAudioDB():
     api_key = Credentials.get_audiodb_token()
-    baseUrl = f"https://www.theaudiodb.com/api/v1/json/{api_key}/"
+    baseUrl = f"https://www.theaudiodb.com/api/v1/json/2/"
 
     @classmethod
-    def find_artist_details_by_artist_name(cls, artistName):
+    def search_artist_details_by_artist_name(cls, artistName):
         response_data = get(f"{cls.baseUrl}search.php?s={artistName}")
         return response_data
 
     @classmethod
-    def find_album_details_by_artist_name(cls, artistName):
+    def search_album_details_by_artist_name(cls, artistName):
         response_data = get(f"{cls.baseUrl}searchalbum.php?s={artistName}")
         return response_data
 
     @classmethod
-    def find_album_details_by_artist_name_and_album_name(cls, artistName, albumName):
+    def search_album_details_by_artist_name_and_album_name(cls, artistName, albumName):
         response_data = get(f"{cls.baseUrl}searchalbum.php?s={artistName}&t={albumName}")
         return response_data
 
     @classmethod
-    def find_track_details_by_artist_name_and_album_name(cls, artistName, albumName):
+    def search_track_details_by_artist_name_and_album_name(cls, artistName, albumName):
         response_data = get(f"{cls.baseUrl}searchtrack.php?s={artistName}&t={albumName}")
         return response_data
 
     @classmethod
-    def find_discography_by_artist_name_with_album_names_and_year(cls, artistName,):
+    def search_discography_by_artist_name_with_album_names_and_year(cls, artistName,):
         response_data = get(f"{cls.baseUrl}discography.php?s={artistName}")
         return response_data

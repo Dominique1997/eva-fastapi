@@ -3,4 +3,6 @@ uvicorn
 requests
 wolframalpha
 PyJWT
-nltk
+openmeteo-requests
+requests-cache
+retry-requests

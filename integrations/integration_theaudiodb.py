@@ -5,11 +5,12 @@ from utilities.credentials import Credentials
 
 class IntegrationTheAudioDB():
     api_key = Credentials.get_audiodb_token()
-    baseUrl = f"https://www.theaudiodb.com/api/v1/json/2/"
+    baseUrl = f"https://www.theaudiodb.com/api/v1/json/{api_key}/"
 
     @classmethod
     def search_artist_details_by_artist_name(cls, artistName):
         response_data = get(f"{cls.baseUrl}search.php?s={artistName}")
+        print(response_data.json())
         return response_data
 
     @classmethod

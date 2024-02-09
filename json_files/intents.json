@@ -1,53 +1,128 @@
 {
     "intents": [
         {
-            "tag":"greeting",
-            "patterns":[
+            "tag": "recipe_by_name",
+            "patterns": [
+                "how to make a",
+                "give me the recipe for a",
+                "how to make an",
+                "give me the recipe for an"
+            ],
+            "responses": {
+                "meal": [
+                    "{mealName}. This is a {areaName} dish. The ingredients for this are {mealIngredients}. The instructions are {mealInstructions}"
+                ],
+                "cocktail": [
+                    "{drinkName}. Please serve this in a {drinkGlass}. The instructions are {drinkInstructions}",
+                    "Your chosen drink is {drinkName}. For this delicious drink, I recommend using a {drinkGlass}. To make this great drink follow the provided instructions: {drinkInstructions}"
+                ],
+                "failure": [
+                    "There is no recipe available for {recipe_name}"
+                ]
+            },
+            "accessible_by": [
+                "windows",
+                "linux",
+                "ios",
+                "android",
+                "discord"
+            ],
+            "trigger": ["integration_themealdb", "integration_thecocktaildb"]
+        },
+        {
+            "tag": "lg_master_channel_vtm",
+            "domain": "script",
+            "patterns": [
+                "open vtm on lg master",
+                "start vtm on lg master",
+                "vtm lg master"
+            ],
+            "specific_words": [
+                "vtm",
+                "VTM"
+            ],
+            "responses": {
+                "success": [
+                    "opening vtm on lg master",
+                    "starting vtm on lg master"
+                ],
+                "failure": [
+                    "Failed to start VTM on LG Master"
+                ]
+            },
+            "accessible_by": [
+                "windows",
+                "linux",
+                "ios",
+                "android"
+            ],
+            "trigger": ["integration_home_assistant"]
+        },
+        {
+            "tag": "greeting",
+            "patterns": [
                 "hi",
                 "hello",
                 "good morning"
             ],
-            "responses":[
-                "hi how are you",
-                "hello"
-            ],
-            "accessible_by":[
+            "responses": {
+                "success": [
+                    "hi how are you",
+                    "hello"
+                ],
+                "failure": [
+                    "Failed to recognize the greeting"
+                ]
+            },
+            "accessible_by": [
                 "windows",
                 "linux",
                 "android",
-                "ios"
+                "ios",
+                "discord"
             ]
         },
         {
-            "tag":"minecraft_sword",
-            "patterns":[
+            "tag": "minecraft_sword",
+            "patterns": [
                 "i need my sword",
                 "provide my sword",
                 "give me my sword",
                 "i do not see my sword",
                 "where is my sword"
             ],
-            "responses":[
-                "sword is coming",
-                "sword will be provided"
-            ],
-            "accessible_by":[
+            "responses": {
+                "success": [
+                    "sword is coming",
+                    "sword will be provided"
+                ],
+                "failure": [
+                    "Failed to provide the sword in Minecraft"
+                ]
+            },
+            "accessible_by": [
                 "windows",
                 "linux"
             ]
         },
         {
-            "tag":"lg_master_app_youtube",
-            "patterns":[
+            "tag": "lg_master_app_youtube",
+            "domain": "script",
+            "patterns": [
                 "open youtube on lg master",
                 "start youtube on lg master",
                 "youtube lg master"
             ],
-            "responses":[
-                "opening youtube on lg master",
-                "starting youtube on lg master"
-            ],
-            "accessible_by":[
+            "responses": {
+                "success": [
+                    "opening youtube on lg master",
+                    "starting youtube on lg master"
+                ],
+                "failure": [
+                    "Failed to start YouTube on LG Master"
+                ]
+            },
+            "accessible_by": [
                 "windows",
                 "linux",
                 "ios",
@@ -56,17 +131,23 @@
             "trigger": ["integration_home_assistant"]
         },
         {
-            "tag":"lg_master_app_disney_plus",
-            "patterns":[
+            "tag": "lg_master_app_disney+",
+            "domain": "script",
+            "patterns": [
                 "open disney plus on lg master",
                 "start disney plus on lg master",
                 "disney plus lg master"
             ],
-            "responses":[
-                "opening disney plus on lg master",
-                "starting disney plus on lg master"
-            ],
-            "accessible_by":[
+            "responses": {
+                "success": [
+                    "opening disney plus on lg master",
+                    "starting disney plus on lg master"
+                ],
+                "failure": [
+                    "Failed to start Disney Plus on LG Master"
+                ]
+            },
+            "accessible_by": [
                 "windows",
                 "linux",
                 "ios",
@@ -75,17 +156,23 @@
             "trigger": ["integration_home_assistant"]
         },
         {
-            "tag":"lg_master_app_spotify",
-            "patterns":[
+            "tag": "lg_master_app_spotify",
+            "domain": "script",
+            "patterns": [
                 "open spotify on lg master",
                 "start spotify on lg master",
                 "spotify lg master"
             ],
-            "responses":[
-                "opening spotify on lg master",
-                "starting spotify on lg master"
-            ],
-            "accessible_by":[
+            "responses": {
+                "success": [
+                    "opening spotify on lg master",
+                    "starting spotify on lg master"
+                ],
+                "failure": [
+                    "Failed to start Spotify on LG Master"
+                ]
+            },
+            "accessible_by": [
                 "windows",
                 "linux",
                 "ios",
@@ -94,8 +181,9 @@
             "trigger": ["integration_home_assistant"]
         },
         {
-            "tag":"lg_master_source_playstation_5",
-            "patterns":[
+            "tag": "lg_master_source_playstation_5",
+            "domain": "script",
+            "patterns": [
                 "open playstation 5 on lg master",
                 "start playstation 5 on lg master",
                 "playstation 5 lg master",
@@ -107,95 +195,67 @@
                 "ps 5 lg master",
                 "play a game lg master"
             ],
-            "responses":[
-                "opening playstation 5 on lg master",
-                "starting playstation 5 on lg master"
-            ],
-            "accessible_by":[
-                "windows",
-                "linux",
-                "ios",
-                "android"
-            ],
-            "trigger": ["integration_home_assistant"]
-        },
-        {
-            "tag":"lg_master_app_vtm_go",
-            "patterns":[
-                "open vtm go on lg master",
-                "start vtm go on lg master",
-                "disney vtm go master"
-            ],
-            "responses":[
-                "opening vtm go on lg master",
-                "starting vtm go on lg master"
-            ],
-            "accessible_by":[
-                "windows",
-                "linux",
-                "ios",
-                "android"
-            ],
-            "trigger": ["integration_home_assistant"]
-        },
-        {
-            "tag":"lg_master_channel_vtm",
-            "patterns":[
-                "open vtm on lg master",
-                "start vtm on lg master",
-                "vtm lg master"
-            ],
-            "responses":[
-                "opening vtm on lg master",
-                "starting vtm on lg master"
-            ],
-            "accessible_by":[
-                "windows",
-                "linux",
-                "ios",
-                "android"
-            ],
-            "trigger": ["integration_home_assistant"]
-        },
-        {
-            "tag":"recipe_by_name",
-            "patterns":[
-                "how to make a",
-                "give me the recipe for a",
-                "how to make an",
-                "give me the recipe for an"
-            ],
-            "responses":
-            {
-                "meal": [
-                "{mealName}. This is a {areaName} dish. The ingredients for this are {mealIngredients}. The instructions are {mealInstructions}"
-            ],
-                "cocktail": [
-                "{drinkName}. Please serve this in a {drinkGlass}. The instructions are {drinkInstructions}",
-                "Your chosen drink is {drinkName}. For this delicious drink I recommend to use a {drinkGlass}. To make this great drink follow the provided instructions: {drinkInstructions}"
-            ],
-                "failure_response": [
-                "There is no recipe available for {recipe_name}"
-            ]
+            "responses": {
+                "success": [
+                    "opening playstation 5 on lg master",
+                    "starting playstation 5 on lg master"
+                ],
+                "failure": [
+                    "Failed to start PlayStation 5 on LG Master"
+                ]
             },
-            "accessible_by":[
+            "accessible_by": [
                 "windows",
                 "linux",
                 "ios",
-                "android",
-                "discord"
+                "android"
             ],
-            "trigger": ["integration_themealdb", "integration_thecocktaildb"]
+            "trigger": ["integration_home_assistant"]
         },
         {
-            "tag":"upcoming_holidays",
-            "patterns":[
+            "tag": "lg_master_app_vtm_go",
+            "domain": "script",
+            "patterns": [
+                "open vtm go on lg master",
+                "start vtm go on lg master"
+            ],
+            "specific_words": [
+                "vtm go",
+                "VTM GO",
+                "vtm GO",
+                "vtm Go"
+            ],
+            "responses": {
+                "success": [
+                    "opening vtm go on lg master",
+                    "starting vtm go on lg master"
+                ],
+                "failure": [
+                    "Failed to start VTM Go on LG Master"
+                ]
+            },
+            "accessible_by": [
+                "windows",
+                "linux",
+                "ios",
+                "android"
+            ],
+            "trigger": ["integration_home_assistant"]
+        },
+        {
+            "tag": "upcoming_holidays",
+            "patterns": [
                 "what are the upcoming holidays"
             ],
-            "responses": [
-                "{holidayName}. This is a {holidayType} and will be held on {holidayDate}."
-            ],
-            "accessible_by":[
+            "responses": {
+                "success": [
+                    "{holidayName}. This is a {holidayType} and will be held on {holidayDate}."
+                ],
+                "failure": [
+                    "Failed to retrieve upcoming holidays"
+                ]
+            },
+            "accessible_by": [
                 "windows",
                 "linux",
                 "ios",
@@ -205,16 +265,22 @@
             "trigger": ["integration_calendarific"]
         },
         {
-            "tag":"video_information",
-            "patterns":[
+            "tag": "video_information",
+            "patterns": [
                 "get me information about the movie"
             ],
             "responses": {
-                "movie": [ "{movieTitle}. This is a {movieGenre} from {movieYear}. The plot goes as follows: {moviePlot}"],
-                "tv": ["{tvTitle}. This is a {tvGenre} from {tvYear}. The plot goes as follows: {tvPlot}"],
-                "failure": ["There is no movie or tv show avaiable under the name {movieTitle}"]
+                "movie": [
+                    "{movieTitle}. This is a {movieGenre} from {movieYear}. The plot goes as follows: {moviePlot}"
+                ],
+                "tv": [
+                    "{tvTitle}. This is a {tvGenre} from {tvYear}. The plot goes as follows: {tvPlot}"
+                ],
+                "failure": [
+                    "There is no movie or TV show available under the name {movieTitle}"
+                ]
             },
-            "accessible_by":[
+            "accessible_by": [
                 "windows",
                 "linux",
                 "ios",
@@ -224,16 +290,20 @@
             "trigger": ["integration_omdb"]
         },
         {
-            "tag":"audio_information",
-            "patterns":[
-                "who is"
+            "tag": "audio_information",
+            "patterns": [
+                "who is",
+                "show me information about"
             ],
-            "responses":
-            {
-                "success": ["{artistName}. {artistBiography}"],
-                "failure": ["There is no information about {artistName}"]
+            "responses": {
+                "success": [
+                    "{artistName}. {artistBiography}"
+                ],
+                "failure": [
+                    "There is no information about {artistName}"
+                ]
             },
-            "accessible_by":[
+            "accessible_by": [
                 "windows",
                 "linux",
                 "ios",
@@ -241,6 +311,52 @@
                 "discord"
             ],
             "trigger": ["integration_audiodb"]
+        },
+        {
+            "tag": "tcl_volume_up",
+            "domain": "script",
+            "patterns": [
+                "turn up the volume on tcl tv living room",
+                "set the tv louder on tcl tv living room"
+            ],
+            "responses": {
+                "success": [
+                    "turning up the volume on tcl tv living room"
+                ],
+                "failure": [
+                    "Failed to turn up the volume on tcl tv living room"
+                ]
+            },
+            "accessible_by": [
+                "windows",
+                "linux",
+                "ios",
+                "android"
+            ],
+            "trigger": ["integration_home_assistant"]
+        },
+        {
+            "tag": "tcl_volume_down",
+            "domain": "script",
+            "patterns": [
+                "turn down the volume on tcl tv living room",
+                "set the tv more quit on tcl tv living room"
+            ],
+            "responses": {
+                "success": [
+                    "turning down the volume on tcl tv living room"
+                ],
+                "failure": [
+                    "Failed to turn down the volume on tcl tv living room"
+                ]
+            },
+            "accessible_by": [
+                "windows",
+                "linux",
+                "ios",
+                "android"
+            ],
+            "trigger": ["integration_home_assistant"]
         }
     ]
 }

@@ -6,7 +6,7 @@
   "login_time_hours": 1,
   "login_time_days": 0,
   "login_time_weeks": 0,
-  "server_port": 9999,
+  "server_port": 9998,
   "server_ip": "localhost",
   "sql_server_ip": "192.168.1.234",
   "sql_server_port": 3307,

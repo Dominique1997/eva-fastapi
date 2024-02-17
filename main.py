@@ -1,22 +1,20 @@
-import logging
 import datetime
 import jwt
 import uvicorn
-from requests import get
+import string
+from integrations.integration_logging import IntegrationLogging as logging
 from utilities.dataModels import *
 from utilities.settings import Settings
 from integrations.integration_ai import IntegrationAi
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from integrations.integration_calendarific import IntegrationCalendarific
 from integrations.integration_database import IntegrationDatabase
 from integrations.integration_openmeteo import IntegrationOpenMeto
-from integrations.integration_home_assistant import IntegrationHomeAssistant
 from integrations.integration_omdb import IntegrationOMDB
 from integrations.tobechecked_integration_openlibrary import IntegrationOpenLibrary
 #from integrations.integration_openmeteo import IntegrationOpenMeteo
-from integrations.tobefixed_integration_pokemon import IntegrationPokemon
 from integrations.integration_theaudiodb import IntegrationTheAudioDB
 from integrations.integration_thecocktaildb import IntegrationTheCocktailDB
 from integrations.integration_themealdb import IntegrationTheMealDB
@@ -33,7 +31,6 @@ app.add_middleware(
     allow_origins=["*"],
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
 )
-
 
 
 def get_country_code():
@@ -119,10 +116,13 @@ async def post_token_generate(tokenData: dict):
     logging.info("Generating token")
     return encode_data(tokenData)
 
+
 @app.post("/api/ai/check", tags=["ai"])
 async def get_command_check(readCommand: ReadCommand):
     OSType = readCommand.OSType
-    command = readCommand.command
+    command = str(readCommand.command).lower()
+    for punctuation in string.punctuation:
+        command = str(command).replace(punctuation, "")
     logging.info(f"Checking the sentence {command} received from {OSType}")
     return integrationAI.check_sentence(command.lower(), OSType)
 
@@ -212,24 +212,21 @@ async def theaudiodb_search_artist_details_by_artist_name(artistName: str):
 
 
 @app.get("/api/openmeteo/get_rain_percentage_today", tags=["openmeteo"])
-async def openmeteo_get_rain_percentage():
+async def openmeteo_get_rain_percentage_today():
     logging.info(f"Checking weather rain data today")
     return JSONResponse(content=IntegrationOpenMeto.get_rain_percentage(), status_code=200, media_type="application/json")
 
 
 @app.get("/api/openmeteo/get_rain_percentage_tomorrow", tags=["openmeteo"])
-async def openmeteo_get_rain_percentage():
+async def openmeteo_get_rain_percentage_tomorrow():
     logging.info(f"Checking weather rain data tomorrow")
     return JSONResponse(content=IntegrationOpenMeto.get_rain_percentage(1), status_code=200, media_type="application/json")
 
 
 @app.get("/api/openmeteo/get_rain_percentage_the_day_after_tomorrow", tags=["openmeteo"])
-async def openmeteo_get_rain_percentage():
+async def openmeteo_get_rain_percentage_the_day_after_tomorrow():
     logging.info(f"Checking weather rain data the day after tomorrow")
     return JSONResponse(content=IntegrationOpenMeto.get_rain_percentage(2), status_code=200, media_type="application/json")
-
-
-
 
 
 @app.get("/api/openmeteo/get_snowfall_hourly_today", tags=["openmeteo"])
@@ -282,10 +279,5 @@ async def tables_reset():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        filename=f'logs/{datetime.datetime.now().date()}.log'
-    )
     IntegrationDatabase.new_database_setup()
     uvicorn.run(app, host=Settings.get_server_ip(), port=Settings.get_server_port())

@@ -1,4 +1,5 @@
 from requests import get
+from integrations.integration_logging import IntegrationLogging as logging
 from utilities.credentials import Credentials
 from datetime import datetime
 

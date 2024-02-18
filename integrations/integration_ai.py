@@ -3,6 +3,7 @@ from integrations.integration_logging import IntegrationLogging as logging
 import string
 from random import choice
 from integrations.integration_omdb import IntegrationOMDB
+import languagemodels
 from integrations.integration_themealdb import IntegrationTheMealDB
 from integrations.integration_theaudiodb import IntegrationTheAudioDB
 from integrations.integration_calendarific import IntegrationCalendarific
@@ -234,10 +235,14 @@ def _execute_intent(intent_name, intent_data, sentence):
         intent_response["triggers"] = triggers
         return intent_response
 
-    wolframalphaAnswer = IntegrationWolframAlpha.perform_check(sentence)
-    wolframalphaAnswer["triggers"] = "wolframalpha"
-    logging.info(f"Using wolframalpha as backup: {wolframalphaAnswer}")
-    return wolframalphaAnswer
+    #wolframalphaAnswer = IntegrationWolframAlpha.perform_check(sentence)
+    #wolframalphaAnswer["triggers"] = "wolframalpha"
+    #logging.info(f"Using wolframalpha as backup: {wolframalphaAnswer}")
+    #return wolframalphaAnswer
+    return {"forced_behaviour": True,
+            "answer": languagemodels.do(sentence),
+            }
+
 
 class IntegrationAi:
     intents = json.load(open("json_files/intents.json"))["intents"]

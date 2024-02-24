@@ -61,11 +61,12 @@ def _handle_calendarific(year, country_code, intent):
                     "answer": response,
                     }
     except:
-        logging.warning(f"Errorcode: 404. Errortext: {all_holidays.text}")
-        response = str(choice(intent["responses"]["failure"]))
-        return {"forced_behaviour": True,
-                "answer": response,
-                }
+        raise Exception
+        #logging.warning(f"Errorcode: 404. Errortext: {all_holidays.text}")
+        #response = str(choice(intent["responses"]["failure"]))
+        #return {"forced_behaviour": True,
+        #        "answer": response,
+        #        }
 
 
 def _handle_home_assistant(tag, intent):
@@ -77,12 +78,13 @@ def _handle_home_assistant(tag, intent):
         return {"forced_behaviour": True,
                 "answer": response,
                 }
-    except Exception as e:
-        logging.warning(f"An error occured when performing {tag}")
-        response = str(choice(intent["responses"]["failure"]))
-        return {"forced_behaviour": True,
-                "answer": response,
-                }
+    except:
+        raise Exception
+        #logging.warning(f"An error occured when performing {tag}")
+        #response = str(choice(intent["responses"]["failure"]))
+        #return {"forced_behaviour": True,
+        #        "answer": response,
+        #        }
 
 
 def _handle_omdb(sentence, intent):
@@ -103,11 +105,12 @@ def _handle_omdb(sentence, intent):
                 "answer": response,
                 }
     except:
-        logging.warning(f"No information found for {movie_name}")
-        response = str(choice(intent["responses"]["failure"])).format(**{"movieTitle": movie_name})
-        return {"forced_behaviour": True,
-                "answer": response,
-                }
+        raise Exception
+        #logging.warning(f"No information found for {movie_name}")
+        #response = str(choice(intent["responses"]["failure"])).format(**{"movieTitle": movie_name})
+        #return {"forced_behaviour": True,
+        #        "answer": response,
+        #        }
 
 
 def _handle_theaudiodb(sentence, intent):
@@ -125,11 +128,12 @@ def _handle_theaudiodb(sentence, intent):
                 "answer": response,
                 }
     except:
-        logging.warning(f"No artist data found for {artist_name}")
-        response = str(choice(intent["responses"]["failure"])).format(**{"artistName": artist_name})
-        return {"forced_behaviour": True,
-                "answer": response,
-                }
+        raise Exception
+        #logging.warning(f"No artist data found for {artist_name}")
+        #response = str(choice(intent["responses"]["failure"])).format(**{"artistName": artist_name})
+        #return {"forced_behaviour": True,
+        #        "answer": response,
+        #        }
 
 def _handle_themealdb_or_thecocktaildb(sentence, intent):
     meal_name = ' '.join([word for word in str(sentence).split(" ") if word not in intent["patterns"]]).strip()
@@ -200,48 +204,50 @@ def _handle_themealdb_or_thecocktaildb(sentence, intent):
                                 "answer": str(answer_option).format(**drink_data),
                                 }
             except:
-                error_data = {"recipe_name": meal_name or cocktail_name}
-                logging.info(f"No meal or cocktail found: {error_data}")
-                response = str(choice(intent["responses"]["failure"])).format(**error_data)
-                return {"forced_behaviour": True,
-                        "answer": response,
-                        }
+                raise Exception
+                #error_data = {"recipe_name": meal_name or cocktail_name}
+                #logging.info(f"No meal or cocktail found: {error_data}")
+                #response = str(choice(intent["responses"]["failure"])).format(**error_data)
+                #return {"forced_behaviour": True,
+                #        "answer": response,
+                #        }
 
 
 def _execute_intent(intent_name, intent_data, sentence):
     triggers = intent_data["trigger"]
-    if "integration_home_assistant" in triggers:
-        intent_response = _handle_home_assistant(intent_name, intent_data)
-        intent_response["triggers"] = triggers
-        return intent_response
+    try:
+        if "integration_home_assistant" in triggers:
+            intent_response = _handle_home_assistant(intent_name, intent_data)
+            intent_response["triggers"] = triggers
+            return intent_response
 
-    if "integration_themealdb" in triggers or "integration_thecocktaildb" in triggers:
-        intent_response = _handle_themealdb_or_thecocktaildb(sentence, intent_data)
-        intent_response["triggers"] = triggers
-        return intent_response
+        if "integration_themealdb" in triggers or "integration_thecocktaildb" in triggers:
+            intent_response = _handle_themealdb_or_thecocktaildb(sentence, intent_data)
+            intent_response["triggers"] = triggers
+            return intent_response
 
-    if "integration_calendarific" in triggers:
-        intent_response = _handle_calendarific("2024", "kdm", intent_data)
-        intent_response["triggers"] = triggers
-        return intent_response
+        if "integration_calendarific" in triggers:
+            intent_response = _handle_calendarific("2024", "kdm", intent_data)
+            intent_response["triggers"] = triggers
+            return intent_response
 
-    if "integration_omdb" in triggers:
-        intent_response = _handle_omdb(sentence, intent_data)
-        intent_response["triggers"] = triggers
-        return intent_response
+        if "integration_omdb" in triggers:
+            intent_response = _handle_omdb(sentence, intent_data)
+            intent_response["triggers"] = triggers
+            return intent_response
 
-    if "integration_audiodb" in triggers:
-        intent_response = _handle_theaudiodb(sentence, intent_data)
-        intent_response["triggers"] = triggers
-        return intent_response
-
+        if "integration_audiodb" in triggers:
+            intent_response = _handle_theaudiodb(sentence, intent_data)
+            intent_response["triggers"] = triggers
+            return intent_response
+    except:
+        return {"forced_behaviour": True,
+                "answer": languagemodels.do(sentence),
+                }
     #wolframalphaAnswer = IntegrationWolframAlpha.perform_check(sentence)
     #wolframalphaAnswer["triggers"] = "wolframalpha"
     #logging.info(f"Using wolframalpha as backup: {wolframalphaAnswer}")
     #return wolframalphaAnswer
-    return {"forced_behaviour": True,
-            "answer": languagemodels.do(sentence),
-            }
 
 
 class IntegrationAi:
@@ -291,4 +297,6 @@ class IntegrationAi:
             return _execute_intent(highest_intersection_tag, highest_intent_data, sentence)
         else:
             logging.critical("No intersection found")
-            return {"forced_behaviour": False, "answer": "No result is found"}
+            return {"forced_behaviour": True,
+                    "answer": languagemodels.do(sentence),
+                    }

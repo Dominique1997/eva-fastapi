@@ -20,6 +20,7 @@ from integrations.integration_thecocktaildb import IntegrationTheCocktailDB
 from integrations.integration_themealdb import IntegrationTheMealDB
 #from integrations.integration_tvdb import IntegrationTVDB
 from integrations.integration_wolframalpha import IntegrationWolframAlpha
+import languagemodels
 #from integrations.integration_home_assistant import IntegrationHomeAssistant
 
 integrationAI = IntegrationAi()
@@ -269,6 +270,12 @@ async def openmeteo_get_cloud_cover_hourly_the_day_after_tomorrow():
 async def openmeteo_get_cloud_cover_hourly_the_day_after_tomorrow():
     logging.info(f"Checking cloud cover data the day after tomorrow")
     return JSONResponse(content=IntegrationOpenMeto.get_cloud_cover_percentage(), status_code=200, media_type="application/json")
+
+
+@app.get("/api/languagemodel", tags=["languagemodel"])
+async def languagemodel_get_response(input: str):
+    logging.info(f"Checking languagemodel")
+    return JSONResponse(content=languagemodels.do(input), status_code=200, media_type="application/json")
 
 
 @app.post("/api/tables/reset", tags=["tables"])

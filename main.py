@@ -58,66 +58,6 @@ async def get_api_state():
     return JSONResponse(content={"api_state": True}, status_code=200, media_type="application/json")
 
 
-@app.post("/api/user/create", tags=["user"])
-async def post_user_create(createUser: CreateUser):
-    logging.info("Creating user")
-    new_username = createUser.username
-    new_password = createUser.password
-    db_result = IntegrationDatabase.create_new_user(new_username, new_password)
-    if db_result == 1:
-        logging.info("User is created")
-        return JSONResponse(content={"User creation": True}, status_code=200, media_type="application/json")
-    logging.warning("User could not be created")
-    return JSONResponse(content={"User creation": False}, status_code=404, media_type="application/json")
-
-
-@app.post("/api/user/read", tags=["user"])
-async def post_user_read(readUser: ReadUser):
-    logging.info("Selecting user")
-    read_username = readUser.username
-    read_password = readUser.password
-    db_result = IntegrationDatabase.read_existing_user(read_username, read_password)
-    if len(db_result) == 1:
-        logging.info(f"User is found")
-        return JSONResponse(content={"UserId": db_result[0]}, status_code=200, media_type="application/json")
-    logging.warning(f"User could not be found")
-    return JSONResponse(content={"UserId": -1}, status_code=404, media_type="application/json")
-
-
-@app.patch("/api/user/update", tags=["user"])
-async def patch_user_update(updateUser: UpdateUser):
-    logging.info("Updating user")
-    userID = updateUser.userID
-    new_username = updateUser.username
-    new_password = updateUser.password
-    db_result = IntegrationDatabase.update_existing_user(userID, new_username, new_password)
-    if db_result == 1:
-        logging.info("User is updated")
-        return JSONResponse(content={"User update": True}, status_code=200, media_type="application/json")
-    logging.warning("User could not be updated")
-    return JSONResponse(content={"User update": False}, status_code=404, media_type="application/json")
-
-
-@app.delete("/api/user/delete", tags=["user"])
-async def put_user_delete(deleteUser: DeleteUser):
-    logging.info("Deleting user")
-    userId = deleteUser.userID
-    username = deleteUser.username
-    password = deleteUser.password
-    db_result = IntegrationDatabase.delete_existing_user(userId, username, password)
-    if db_result == 1:
-        logging.info("User is deleted")
-        return JSONResponse(content={"User delete": True}, status_code=200, media_type="application/json")
-    logging.warning("User could not be removed")
-    return JSONResponse(content={"User delete": False}, status_code=404, media_type="application/json")
-
-
-@app.post("/api/token/generate", tags=["token"])
-async def post_token_generate(tokenData: dict):
-    logging.info("Generating token")
-    return encode_data(tokenData)
-
-
 @app.post("/api/ai/check", tags=["ai"])
 async def get_command_check(readCommand: ReadCommand):
     OSType = readCommand.OSType

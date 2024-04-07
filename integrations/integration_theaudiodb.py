@@ -10,6 +10,7 @@ class IntegrationTheAudioDB():
     @classmethod
     def search_artist_details_by_artist_name(cls, artistName):
         response_data = get(f"{cls.baseUrl}search.php?s={artistName}")
+        print(response_data.status_code, response_data.content)
         print(response_data.json())
         return response_data
 

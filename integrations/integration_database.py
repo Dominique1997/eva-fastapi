@@ -1,14 +1,12 @@
+import os
 import sqlite3
-from utilities.settings import Settings
+from utilities.config import Config
 
 class IntegrationDatabase:
-    key = Settings.get_encryption_key()
-    algorithm = Settings.get_algorithm()
-    sql_server_ip = Settings.get_sql_server_ip()
-    sql_server_port = Settings.get_sql_server_port()
-    sql_server_username = Settings.get_sql_server_username()
-    sql_server_password = Settings.get_sql_server_password()
-    sql_server_database_name = Settings.get_sql_server_database_name()
+    key = Config.get_encryption_key()
+    algorithm = Config.get_algorithm()
+    sql_server_ip = Config.get_sql_server_ip()
+    sql_server_port = Config.get_sql_server_port()
 
     db = sqlite3.connect("eva_database.db")
     @classmethod
@@ -53,10 +51,7 @@ class IntegrationDatabase:
 
     @classmethod
     def reset_tables(cls):
-        drop_table_users = "DROP table users"
-        cls._perform_sql_command(drop_table_users)
-        drop_table_tokens = "DROP table tokens;"
-        cls._perform_sql_command(drop_table_tokens)
+        os.remove("database.db")
         cls.new_database_setup()
 
     @classmethod

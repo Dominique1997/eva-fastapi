@@ -3,8 +3,7 @@ import uvicorn
 import jwt
 import string
 from integrations.integration_logging import IntegrationLogging as logging
-from utilities.dataModels import *
-from utilities.settings import Settings
+from utilities.config import Config
 from integrations.integration_ai import IntegrationAi
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
@@ -41,16 +40,9 @@ def get_country_code():
     return "Belgium"
     #country_name["country"]
 
-
-def encode_data(data_string):
-    logging.info(f"encoding {data_string}")
-    return jwt.encode(data_string, algorithm=Settings.get_algorithm(), key=Settings.get_encryption_key())
-
-
-def decode_data(encoded_data):
-    logging.info(f"decoding {encoded_data}")
-    return jwt.decode(encoded_data, algorithms=Settings.get_algorithm(), key=Settings.get_encryption_key())
-
+@app.get("/config/get_server_ip", tags=["config"])
+async def get_server_ip():
+    return JSONResponse(content={"server ip": Config.get_server_ip()}, status_code=200, media_type="application/json")
 
 @app.get("/api/status", tags=["status"])
 async def get_api_state():
@@ -59,7 +51,7 @@ async def get_api_state():
 
 
 @app.post("/api/ai/check", tags=["ai"])
-async def get_command_check(readCommand: ReadCommand):
+async def get_command_check(readCommand):
     OSType = readCommand.OSType
     command = str(readCommand.command).lower()
     for punctuation in string.punctuation:
@@ -227,4 +219,6 @@ async def tables_reset():
 
 if __name__ == "__main__":
     IntegrationDatabase.new_database_setup()
-    uvicorn.run(app, host=Settings.get_server_ip(), port=Settings.get_server_port())
+    server_ip = Config.get_server_ip()
+    server_port = Config.get_server_port()
+    uvicorn.run(app, host=server_ip, port=server_port)
